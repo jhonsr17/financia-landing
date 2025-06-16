@@ -1,0 +1,17 @@
+Plan Detallado para Landing Page + Waitlist (FinancIA)
+1. Stack Tecnológico Recomendado
+Frontend
+    Next.js (React framework):
+        Sencillo para landing pages, SEO friendly, fácil de escalar a web app.
+Tailwind CSS:
+    Para estilos rápidos, modernos y responsivos.
+TypeScript (opcional, recomendado):
+    Para mayor robustez y escalabilidad del código.
+Backend/Formulario
+    API Route de Next.js:
+    Permite crear endpoints backend dentro del mismo proyecto.
+Google Sheets API:
+    Para guardar los leads directamente en una hoja de cálculo de Google Sheets.
+Deploy
+Vercel:
+    Integración nativa con Next.js, despliegue rápido y gratuito.
