@@ -63,9 +63,9 @@ export async function POST(request: Request) {
           values: [[fecha, email, name || '']],
         },
       })
-    } catch (sheetsError) {
-      console.error('Error al acceder a Google Sheets:', sheetsError)
-      throw new Error(`Error de Google Sheets: ${sheetsError.message}`)
+    } catch (error: any) {
+      console.error('Error al acceder a Google Sheets:', error)
+      throw new Error(`Error de Google Sheets: ${error?.message || 'Error desconocido'}`)
     }
 
     return NextResponse.json(
