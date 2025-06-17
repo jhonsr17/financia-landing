@@ -40,6 +40,13 @@ const validateConfig = () => {
     console.error('Invalid spreadsheet ID format')
     throw new Error('Invalid spreadsheet ID format')
   }
+
+  // Verificar que el email del service account tenga el formato correcto
+  const serviceAccountEmail = process.env.GOOGLE_CLIENT_EMAIL
+  if (serviceAccountEmail && !serviceAccountEmail.endsWith('.gserviceaccount.com')) {
+    console.error('Invalid service account email format')
+    throw new Error('Invalid service account email format')
+  }
 }
 
 export async function POST(request: Request) {
@@ -62,6 +69,8 @@ export async function POST(request: Request) {
     // Intentar guardar en Google Sheets
     try {
       // Primero verificar si podemos acceder a la hoja
+      console.log('Intentando acceder a la hoja con el Service Account:', process.env.GOOGLE_CLIENT_EMAIL)
+      
       const spreadsheet = await sheets.spreadsheets.get({
         spreadsheetId,
         ranges: ['A:C'],
@@ -71,6 +80,8 @@ export async function POST(request: Request) {
       if (!spreadsheet.data) {
         throw new Error('No se pudo acceder a la hoja de cálculo')
       }
+
+      console.log('Acceso exitoso a la hoja. Intentando agregar datos...')
 
       // Si podemos acceder, intentar agregar los datos
       const response = await sheets.spreadsheets.values.append({
@@ -86,19 +97,26 @@ export async function POST(request: Request) {
         throw new Error('No se pudo agregar los datos a la hoja')
       }
 
+      console.log('Datos agregados exitosamente')
+
     } catch (error: any) {
       console.error('Error detallado al acceder a Google Sheets:', {
         error: error.message,
         code: error.code,
         status: error.status,
         details: error.errors,
-        serviceAccountEmail: process.env.GOOGLE_CLIENT_EMAIL
+        serviceAccountEmail: process.env.GOOGLE_CLIENT_EMAIL,
+        spreadsheetId: spreadsheetId
       })
       
       if (error.code === 403 || error.message?.includes('permission error')) {
         throw new Error(
           `Error de permisos: El Service Account (${process.env.GOOGLE_CLIENT_EMAIL}) no tiene acceso a la hoja. ` +
-          'Por favor, comparte la hoja con este email y dale permisos de editor.'
+          'Por favor, sigue estos pasos:\n' +
+          '1. Abre tu hoja de Google Sheets\n' +
+          '2. Haz clic en "Compartir" en la esquina superior derecha\n' +
+          '3. Agrega el email del Service Account como editor\n' +
+          '4. Asegúrate de que el Service Account tenga el rol "Editor" en Google Cloud Console'
         )
       }
       if (error.code === 404) {
