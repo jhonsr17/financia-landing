@@ -16,12 +16,31 @@ const sheets = google.sheets({ version: 'v4', auth })
 const spreadsheetId = process.env.GOOGLE_SPREADSHEET_ID
 
 // Validar configuración al inicio
-if (!spreadsheetId) {
-  console.error('Error: GOOGLE_SPREADSHEET_ID no está configurado en .env.local')
+const validateConfig = () => {
+  const missingVars = []
+  if (!process.env.GOOGLE_CLIENT_EMAIL) missingVars.push('GOOGLE_CLIENT_EMAIL')
+  if (!process.env.GOOGLE_PRIVATE_KEY) missingVars.push('GOOGLE_PRIVATE_KEY')
+  if (!process.env.GOOGLE_PROJECT_ID) missingVars.push('GOOGLE_PROJECT_ID')
+  if (!process.env.GOOGLE_SPREADSHEET_ID) missingVars.push('GOOGLE_SPREADSHEET_ID')
+  
+  if (missingVars.length > 0) {
+    console.error('Missing environment variables:', missingVars)
+    throw new Error(`Missing required environment variables: ${missingVars.join(', ')}`)
+  }
+
+  // Verificar formato de la clave privada
+  const privateKey = process.env.GOOGLE_PRIVATE_KEY
+  if (privateKey && !privateKey.includes('-----BEGIN PRIVATE KEY-----')) {
+    console.error('Invalid private key format')
+    throw new Error('Invalid private key format')
+  }
 }
 
 export async function POST(request: Request) {
   try {
+    // Validar configuración
+    validateConfig()
+
     const body = await request.json()
     const { email, name } = body
 
@@ -32,33 +51,68 @@ export async function POST(request: Request) {
       )
     }
 
-    if (!spreadsheetId) {
-      return NextResponse.json(
-        { error: 'Error de configuración del servidor' },
-        { status: 500 }
-      )
-    }
-
     const fecha = new Date().toLocaleString('es-ES', { timeZone: 'America/Bogota' })
     
     // Intentar guardar en Google Sheets
-    await sheets.spreadsheets.values.append({
-      spreadsheetId,
-      range: 'A:C',
-      valueInputOption: 'USER_ENTERED',
-      requestBody: {
-        values: [[fecha, email, name || '']],
-      },
-    })
+    try {
+      await sheets.spreadsheets.values.append({
+        spreadsheetId,
+        range: 'A:C',
+        valueInputOption: 'USER_ENTERED',
+        requestBody: {
+          values: [[fecha, email, name || '']],
+        },
+      })
+    } catch (sheetsError) {
+      console.error('Error al acceder a Google Sheets:', sheetsError)
+      throw new Error(`Error de Google Sheets: ${sheetsError.message}`)
+    }
 
     return NextResponse.json(
       { message: 'Registro exitoso en la lista de espera' },
       { status: 200 }
     )
   } catch (error) {
-    console.error('Error en API de lista de espera:', error)
+    console.error('Error detallado en API de lista de espera:', error)
+    
+    // Manejar diferentes tipos de errores
+    if (error instanceof Error) {
+      if (error.message.includes('Missing required environment variables')) {
+        return NextResponse.json(
+          { 
+            error: 'Error de configuración del servidor',
+            details: error.message
+          },
+          { status: 500 }
+        )
+      }
+      
+      if (error.message.includes('invalid_grant')) {
+        return NextResponse.json(
+          { 
+            error: 'Error de autenticación con Google Sheets',
+            details: 'La clave privada o el email del service account son inválidos'
+          },
+          { status: 500 }
+        )
+      }
+
+      if (error.message.includes('Error de Google Sheets')) {
+        return NextResponse.json(
+          { 
+            error: 'Error al acceder a Google Sheets',
+            details: error.message
+          },
+          { status: 500 }
+        )
+      }
+    }
+
     return NextResponse.json(
-      { error: 'Error al procesar la solicitud. Por favor intenta de nuevo.' },
+      { 
+        error: 'Error al procesar la solicitud',
+        details: error instanceof Error ? error.message : 'Error desconocido'
+      },
       { status: 500 }
     )
   }
