@@ -34,6 +34,12 @@ const validateConfig = () => {
     console.error('Invalid private key format')
     throw new Error('Invalid private key format')
   }
+
+  // Verificar que el spreadsheetId tenga el formato correcto
+  if (spreadsheetId && !/^[a-zA-Z0-9-_]+$/.test(spreadsheetId)) {
+    console.error('Invalid spreadsheet ID format')
+    throw new Error('Invalid spreadsheet ID format')
+  }
 }
 
 export async function POST(request: Request) {
@@ -55,7 +61,19 @@ export async function POST(request: Request) {
     
     // Intentar guardar en Google Sheets
     try {
-      await sheets.spreadsheets.values.append({
+      // Primero verificar si podemos acceder a la hoja
+      const spreadsheet = await sheets.spreadsheets.get({
+        spreadsheetId,
+        ranges: ['A:C'],
+        includeGridData: false
+      })
+
+      if (!spreadsheet.data) {
+        throw new Error('No se pudo acceder a la hoja de cálculo')
+      }
+
+      // Si podemos acceder, intentar agregar los datos
+      const response = await sheets.spreadsheets.values.append({
         spreadsheetId,
         range: 'A:C',
         valueInputOption: 'USER_ENTERED',
@@ -63,8 +81,25 @@ export async function POST(request: Request) {
           values: [[fecha, email, name || '']],
         },
       })
+
+      if (!response.data) {
+        throw new Error('No se pudo agregar los datos a la hoja')
+      }
+
     } catch (error: any) {
-      console.error('Error al acceder a Google Sheets:', error)
+      console.error('Error detallado al acceder a Google Sheets:', {
+        error: error.message,
+        code: error.code,
+        status: error.status,
+        details: error.errors
+      })
+      
+      if (error.code === 403) {
+        throw new Error('No tienes permisos para acceder a esta hoja de cálculo. Verifica que el Service Account tenga acceso.')
+      }
+      if (error.code === 404) {
+        throw new Error('No se encontró la hoja de cálculo. Verifica el ID de la hoja.')
+      }
       throw new Error(`Error de Google Sheets: ${error?.message || 'Error desconocido'}`)
     }
 
@@ -92,6 +127,26 @@ export async function POST(request: Request) {
           { 
             error: 'Error de autenticación con Google Sheets',
             details: 'La clave privada o el email del service account son inválidos'
+          },
+          { status: 500 }
+        )
+      }
+
+      if (error.message.includes('No tienes permisos')) {
+        return NextResponse.json(
+          { 
+            error: 'Error de permisos en Google Sheets',
+            details: error.message
+          },
+          { status: 500 }
+        )
+      }
+
+      if (error.message.includes('No se encontró la hoja')) {
+        return NextResponse.json(
+          { 
+            error: 'Error de acceso a la hoja de cálculo',
+            details: error.message
           },
           { status: 500 }
         )
