@@ -91,11 +91,15 @@ export async function POST(request: Request) {
         error: error.message,
         code: error.code,
         status: error.status,
-        details: error.errors
+        details: error.errors,
+        serviceAccountEmail: process.env.GOOGLE_CLIENT_EMAIL
       })
       
-      if (error.code === 403) {
-        throw new Error('No tienes permisos para acceder a esta hoja de cálculo. Verifica que el Service Account tenga acceso.')
+      if (error.code === 403 || error.message?.includes('permission error')) {
+        throw new Error(
+          `Error de permisos: El Service Account (${process.env.GOOGLE_CLIENT_EMAIL}) no tiene acceso a la hoja. ` +
+          'Por favor, comparte la hoja con este email y dale permisos de editor.'
+        )
       }
       if (error.code === 404) {
         throw new Error('No se encontró la hoja de cálculo. Verifica el ID de la hoja.')
@@ -132,7 +136,7 @@ export async function POST(request: Request) {
         )
       }
 
-      if (error.message.includes('No tienes permisos')) {
+      if (error.message.includes('Error de permisos')) {
         return NextResponse.json(
           { 
             error: 'Error de permisos en Google Sheets',
