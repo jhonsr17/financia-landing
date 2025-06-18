@@ -78,16 +78,16 @@ const ChatCarousel = () => {
   }, []);
 
   return (
-    <section className="bg-[#0D1D35] py-16">
+    <section className="bg-[#0D1D35] py-8 md:py-16">
       <div className="container mx-auto px-4">
-        <h2 className="text-4xl font-bold text-white text-center mb-12">
+        <h2 className="text-2xl md:text-4xl font-bold text-white text-center mb-8 md:mb-12 px-4">
           Imagina tener un amigo que{' '}
           <span className="text-[#9DFAD7]">siempre cuida tu dinero</span>
         </h2>
         
         <div 
           ref={scrollRef}
-          className="flex overflow-x-hidden gap-4 py-4 mb-12"
+          className="flex overflow-x-hidden gap-3 md:gap-4 py-4 mb-8 md:mb-12 px-2 md:px-0"
           style={{ maskImage: 'linear-gradient(to right, transparent, black 10%, black 90%, transparent)' }}
         >
           {[...CHAT_EXAMPLES, ...CHAT_EXAMPLES, ...CHAT_EXAMPLES].map((example, index) => (
@@ -95,7 +95,7 @@ const ChatCarousel = () => {
           ))}
         </div>
 
-        <p className="text-white/80 text-center max-w-4xl mx-auto text-lg leading-relaxed">
+        <p className="text-white/80 text-center max-w-4xl mx-auto text-sm md:text-lg leading-relaxed px-4">
           ¿Necesitas un consejo rápido? Pregúntale. ¿Quieres saber dónde se fue tu último gasto? Él lo sabe. Es la tranquilidad de tener un experto que te acompaña en cada decisión financiera, sin juicios y siempre listo para ayudarte.
         </p>
       </div>

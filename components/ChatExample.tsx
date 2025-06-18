@@ -58,20 +58,20 @@ const ChatExample = ({ messages }: ChatExampleProps) => {
   }, [messages])
 
   return (
-    <div className="bg-[#0D1D35]/50 backdrop-blur-sm rounded-2xl p-4 shadow-xl w-[300px] mx-2 flex-shrink-0 border border-white/10">
+    <div className="bg-[#0D1D35]/50 backdrop-blur-sm rounded-xl md:rounded-2xl p-3 md:p-4 shadow-xl w-[280px] md:w-[300px] mx-1 md:mx-2 flex-shrink-0 border border-white/10">
       {/* Header del chat */}
-      <div className="flex items-center space-x-3 mb-4 pb-3 border-b border-white/10">
-        <div className="w-8 h-8 bg-[#9DFAD7] rounded-full flex items-center justify-center text-[#0D1D35] font-bold">
+      <div className="flex items-center space-x-2 md:space-x-3 mb-3 md:mb-4 pb-2 md:pb-3 border-b border-white/10">
+        <div className="w-6 h-6 md:w-8 md:h-8 bg-[#9DFAD7] rounded-full flex items-center justify-center text-[#0D1D35] font-bold text-sm md:text-base">
           F
         </div>
         <div>
-          <div className="font-medium text-white">FinancIA</div>
-          <div className="text-sm text-white/70">En línea</div>
+          <div className="font-medium text-white text-sm md:text-base">FinancIA</div>
+          <div className="text-xs md:text-sm text-white/70">En línea</div>
         </div>
       </div>
 
       {/* Mensajes */}
-      <div className="space-y-3 min-h-[200px]">
+      <div className="space-y-2 md:space-y-3 min-h-[180px] md:min-h-[200px]">
         {visibleMessages.map((message, index) => (
           <div
             key={index}
@@ -82,9 +82,9 @@ const ChatExample = ({ messages }: ChatExampleProps) => {
                 message.isUser
                   ? 'bg-[#9DFAD7] text-[#0D1D35]'
                   : 'bg-white/10 text-white'
-              } p-3 rounded-2xl max-w-[85%]`}
+              } p-2 md:p-3 rounded-xl md:rounded-2xl max-w-[85%]`}
             >
-              <p className="text-sm whitespace-pre-line">
+              <p className="text-xs md:text-sm whitespace-pre-line leading-relaxed">
                 {message.emoji && <span className="mr-1">{message.emoji}</span>}
                 {message.text}
               </p>
@@ -99,11 +99,11 @@ const ChatExample = ({ messages }: ChatExampleProps) => {
         
         {isTyping && (
           <div className="flex justify-start animate-message-in">
-            <div className="bg-white/10 rounded-2xl p-3">
+            <div className="bg-white/10 rounded-xl md:rounded-2xl p-2 md:p-3">
               <div className="flex space-x-1">
-                <div className="w-2 h-2 bg-white/70 rounded-full animate-typing-1"></div>
-                <div className="w-2 h-2 bg-white/70 rounded-full animate-typing-2"></div>
-                <div className="w-2 h-2 bg-white/70 rounded-full animate-typing-3"></div>
+                <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-white/70 rounded-full animate-typing-1"></div>
+                <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-white/70 rounded-full animate-typing-2"></div>
+                <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-white/70 rounded-full animate-typing-3"></div>
               </div>
             </div>
           </div>
