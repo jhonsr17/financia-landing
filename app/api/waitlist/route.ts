@@ -1,95 +1,131 @@
 import { google } from 'googleapis'
 import { NextResponse } from 'next/server'
+import fs from 'fs'
+import path from 'path'
 
-// Crear una instancia de auth reutilizable
-const auth = new google.auth.GoogleAuth({
-  credentials: {
-    client_email: process.env.GOOGLE_CLIENT_EMAIL,
-    private_key: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-    project_id: process.env.GOOGLE_PROJECT_ID,
-  },
-  scopes: ['https://www.googleapis.com/auth/spreadsheets'],
-})
+// Función para cargar credenciales desde archivo JSON
+const loadCredentials = () => {
+  try {
+    // Intentar cargar desde archivo JSON
+    const credentialsPath = path.join(process.cwd(), 'credentials.json')
+    if (fs.existsSync(credentialsPath)) {
+      const credentials = JSON.parse(fs.readFileSync(credentialsPath, 'utf8'))
+      console.log('✅ Credenciales cargadas desde archivo JSON')
+      return credentials
+    }
+    
+    // Si no existe el archivo, usar variables de entorno
+    if (process.env.GOOGLE_CLIENT_EMAIL && process.env.GOOGLE_PRIVATE_KEY) {
+      console.log('✅ Usando credenciales desde variables de entorno')
+      return {
+        client_email: process.env.GOOGLE_CLIENT_EMAIL,
+        private_key: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+        project_id: process.env.GOOGLE_PROJECT_ID,
+      }
+    }
+    
+    return null
+  } catch (error) {
+    console.error('❌ Error al cargar credenciales:', error)
+    return null
+  }
+}
 
-// Crear una instancia de sheets reutilizable
-const sheets = google.sheets({ version: 'v4', auth })
-const spreadsheetId = process.env.GOOGLE_SPREADSHEET_ID
-
-// Validar configuración al inicio
-const validateConfig = () => {
-  const missingVars = []
-  if (!process.env.GOOGLE_CLIENT_EMAIL) missingVars.push('GOOGLE_CLIENT_EMAIL')
-  if (!process.env.GOOGLE_PRIVATE_KEY) missingVars.push('GOOGLE_PRIVATE_KEY')
-  if (!process.env.GOOGLE_PROJECT_ID) missingVars.push('GOOGLE_PROJECT_ID')
-  if (!process.env.GOOGLE_SPREADSHEET_ID) missingVars.push('GOOGLE_SPREADSHEET_ID')
+// Función para formatear el número de teléfono correctamente
+const formatPhoneNumber = (phone: string) => {
+  // El número ya viene con el prefijo del país desde el formulario
+  // Solo necesitamos limpiarlo y formatearlo para Google Sheets
   
-  if (missingVars.length > 0) {
-    console.error('Missing environment variables:', missingVars)
-    throw new Error(`Missing required environment variables: ${missingVars.join(', ')}`)
-  }
+  // Remover espacios extra y caracteres especiales, pero mantener el +
+  const cleanPhone = phone.replace(/\s+/g, ' ').trim()
+  
+  // Agregar comilla simple al inicio para que Google Sheets lo trate como texto
+  return `'${cleanPhone}`
+}
 
-  // Verificar formato de la clave privada
-  const privateKey = process.env.GOOGLE_PRIVATE_KEY
-  if (privateKey && !privateKey.includes('-----BEGIN PRIVATE KEY-----')) {
-    console.error('Invalid private key format')
-    throw new Error('Invalid private key format')
+const validateConfig = () => {
+  console.log('🔍 Verificando configuración...')
+  
+  const credentials = loadCredentials()
+  if (!credentials) {
+    console.error('❌ No se pudieron cargar las credenciales')
+    return false
   }
-
-  // Verificar que el spreadsheetId tenga el formato correcto
-  if (spreadsheetId && !/^[a-zA-Z0-9-_]+$/.test(spreadsheetId)) {
-    console.error('Invalid spreadsheet ID format')
-    throw new Error('Invalid spreadsheet ID format')
+  
+  console.log('GOOGLE_CLIENT_EMAIL:', credentials.client_email ? '✅ Presente' : '❌ Faltante')
+  console.log('GOOGLE_PRIVATE_KEY:', credentials.private_key ? '✅ Presente' : '❌ Faltante')
+  console.log('GOOGLE_PROJECT_ID:', credentials.project_id ? '✅ Presente' : '❌ Faltante')
+  console.log('GOOGLE_SPREADSHEET_ID:', process.env.GOOGLE_SPREADSHEET_ID ? '✅ Presente' : '❌ Faltante')
+  
+  if (!process.env.GOOGLE_SPREADSHEET_ID) {
+    console.error('❌ GOOGLE_SPREADSHEET_ID faltante')
+    return false
   }
-
-  // Verificar que el email del service account tenga el formato correcto
-  const serviceAccountEmail = process.env.GOOGLE_CLIENT_EMAIL
-  if (serviceAccountEmail && !serviceAccountEmail.endsWith('.gserviceaccount.com')) {
-    console.error('Invalid service account email format')
-    throw new Error('Invalid service account email format')
-  }
+  
+  return true
 }
 
 export async function POST(request: Request) {
   try {
-    // Validar configuración
-    validateConfig()
-
     const body = await request.json()
-    const { email, name } = body
+    const { phone, name, country } = body
 
-    if (!email) {
+    if (!phone) {
       return NextResponse.json(
-        { error: 'El email es requerido' },
+        { error: 'El número de teléfono es requerido' },
         { status: 400 }
       )
     }
 
     const fecha = new Date().toLocaleString('es-ES', { timeZone: 'America/Bogota' })
     
-    // Intentar guardar en Google Sheets
+    // Formatear el número de teléfono correctamente
+    const formattedPhone = formatPhoneNumber(phone)
+    
+    // Verificar configuración
+    const isConfigValid = validateConfig()
+    
+    if (!isConfigValid) {
+      console.error('❌ Configuración incompleta')
+      return NextResponse.json(
+        { error: 'Error de configuración del servidor. Contacta al administrador.' },
+        { status: 500 }
+      )
+    }
+    
+    // Cargar credenciales
+    const credentials = loadCredentials()
+    if (!credentials) {
+      return NextResponse.json(
+        { error: 'Error de autenticación. Contacta al administrador.' },
+        { status: 500 }
+      )
+    }
+    
     try {
-      // Primero verificar si podemos acceder a la hoja
-      console.log('Intentando acceder a la hoja con el Service Account:', process.env.GOOGLE_CLIENT_EMAIL)
+      console.log('🔗 Conectando con Google Sheets...')
       
-      const spreadsheet = await sheets.spreadsheets.get({
-        spreadsheetId,
-        ranges: ['A:C'],
-        includeGridData: false
+      // Crear autenticación
+      const auth = new google.auth.GoogleAuth({
+        credentials,
+        scopes: ['https://www.googleapis.com/auth/spreadsheets'],
       })
-
-      if (!spreadsheet.data) {
-        throw new Error('No se pudo acceder a la hoja de cálculo')
-      }
-
-      console.log('Acceso exitoso a la hoja. Intentando agregar datos...')
-
-      // Si podemos acceder, intentar agregar los datos
+      
+      console.log('✅ Autenticación creada')
+      
+      // Crear instancia de sheets
+      const sheets = google.sheets({ version: 'v4', auth })
+      
+      console.log('✅ Instancia de sheets creada')
+      
+      // Agregar datos a la hoja
+      console.log('📝 Agregando datos a la hoja...')
       const response = await sheets.spreadsheets.values.append({
-        spreadsheetId,
-        range: 'A:C',
+        spreadsheetId: process.env.GOOGLE_SPREADSHEET_ID,
+        range: 'A:D',
         valueInputOption: 'USER_ENTERED',
         requestBody: {
-          values: [[fecha, email, name || '']],
+          values: [[fecha, formattedPhone, name || '', country || '']],
         },
       })
 
@@ -97,21 +133,32 @@ export async function POST(request: Request) {
         throw new Error('No se pudo agregar los datos a la hoja')
       }
 
-      console.log('Datos agregados exitosamente')
+      console.log('✅ Datos guardados exitosamente en Google Sheets')
+      console.log('📊 Datos guardados:', {
+        fecha,
+        phone: formattedPhone,
+        name: name || '',
+        country: country || ''
+      })
+
+      return NextResponse.json(
+        { message: 'Registro exitoso en la lista de espera' },
+        { status: 200 }
+      )
 
     } catch (error: any) {
-      console.error('Error detallado al acceder a Google Sheets:', {
+      console.error('❌ Error al guardar en Google Sheets:', {
         error: error.message,
         code: error.code,
         status: error.status,
         details: error.errors,
-        serviceAccountEmail: process.env.GOOGLE_CLIENT_EMAIL,
-        spreadsheetId: spreadsheetId
+        serviceAccountEmail: credentials.client_email,
+        spreadsheetId: process.env.GOOGLE_SPREADSHEET_ID
       })
       
       if (error.code === 403 || error.message?.includes('permission error')) {
         throw new Error(
-          `Error de permisos: El Service Account (${process.env.GOOGLE_CLIENT_EMAIL}) no tiene acceso a la hoja. ` +
+          `Error de permisos: El Service Account (${credentials.client_email}) no tiene acceso a la hoja. ` +
           'Por favor, sigue estos pasos:\n' +
           '1. Abre tu hoja de Google Sheets\n' +
           '2. Haz clic en "Compartir" en la esquina superior derecha\n' +
@@ -125,66 +172,9 @@ export async function POST(request: Request) {
       throw new Error(`Error de Google Sheets: ${error?.message || 'Error desconocido'}`)
     }
 
-    return NextResponse.json(
-      { message: 'Registro exitoso en la lista de espera' },
-      { status: 200 }
-    )
   } catch (error) {
-    console.error('Error detallado en API de lista de espera:', error)
+    console.error('❌ Error en API de lista de espera:', error)
     
-    // Manejar diferentes tipos de errores
-    if (error instanceof Error) {
-      if (error.message.includes('Missing required environment variables')) {
-        return NextResponse.json(
-          { 
-            error: 'Error de configuración del servidor',
-            details: error.message
-          },
-          { status: 500 }
-        )
-      }
-      
-      if (error.message.includes('invalid_grant')) {
-        return NextResponse.json(
-          { 
-            error: 'Error de autenticación con Google Sheets',
-            details: 'La clave privada o el email del service account son inválidos'
-          },
-          { status: 500 }
-        )
-      }
-
-      if (error.message.includes('Error de permisos')) {
-        return NextResponse.json(
-          { 
-            error: 'Error de permisos en Google Sheets',
-            details: error.message
-          },
-          { status: 500 }
-        )
-      }
-
-      if (error.message.includes('No se encontró la hoja')) {
-        return NextResponse.json(
-          { 
-            error: 'Error de acceso a la hoja de cálculo',
-            details: error.message
-          },
-          { status: 500 }
-        )
-      }
-
-      if (error.message.includes('Error de Google Sheets')) {
-        return NextResponse.json(
-          { 
-            error: 'Error al acceder a Google Sheets',
-            details: error.message
-          },
-          { status: 500 }
-        )
-      }
-    }
-
     return NextResponse.json(
       { 
         error: 'Error al procesar la solicitud',
