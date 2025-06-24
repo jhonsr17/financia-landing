@@ -3,14 +3,16 @@ import { WaitlistForm } from '@/components/WaitlistForm'
 import ChatCarousel from '@/components/ChatCarousel'
 import StatsSection from '@/components/StatsSection'
 import FeaturesGrid from '@/components/FeaturesGrid'
+import PricingSection from '@/components/PricingSection'
 
 export default function Home() {
   return (
     <main className='min-h-screen bg-[#0D1D35]'>
-      <nav className='container mx-auto px-4 py-4 md:py-6 flex justify-between items-center'>
+      <nav className='sticky top-0 z-50 bg-[#0D1D35]/95 backdrop-blur-sm border-b border-white/10 container mx-auto px-4 py-4 md:py-6 flex justify-between items-center'>
         <h1 className='text-xl md:text-2xl font-bold text-white'>FinancIA</h1>
         <div className='space-x-4 md:space-x-6'>
           <a href='#producto' className='text-white hover:text-[#9DFAD7] transition-colors text-sm md:text-base'>Producto</a>
+          <a href='#plan' className='text-white hover:text-[#9DFAD7] transition-colors text-sm md:text-base'>Plan</a>
           <a href='#inicio' className='text-white hover:text-[#9DFAD7] transition-colors text-sm md:text-base'>Inicio</a>
         </div>
       </nav>
@@ -75,6 +77,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Pricing Section */}
+      <PricingSection />
 
       {/* Footer */}
       <footer className='relative py-12 md:py-16 overflow-hidden'>
