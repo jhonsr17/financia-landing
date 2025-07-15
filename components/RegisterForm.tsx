@@ -9,14 +9,17 @@ export const RegisterForm = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [isSuccessful, setIsSuccessful] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setError('')
     setSuccess('')
     setIsLoading(true)
+    setIsSuccessful(false)
 
     const formData = new FormData(e.currentTarget)
+    const form = e.currentTarget // Guardar referencia al formulario
     
     try {
       const result = await signUp(formData)
@@ -25,11 +28,17 @@ export const RegisterForm = () => {
         setError(result.error)
       } else if (result?.success) {
         setSuccess(result.success)
-        // Limpiar formulario
-        e.currentTarget.reset()
+        setIsSuccessful(true)
+        // Limpiar formulario después de mostrar éxito
+        setTimeout(() => {
+          form.reset()
+        }, 3000) // Limpiar después de 3 segundos
+      } else {
+        setError('Error inesperado. Intenta nuevamente')
       }
     } catch (error) {
-      setError('Error inesperado. Intenta nuevamente')
+      console.error('Error en registro:', error)
+      setError('Error de conexión. Intenta nuevamente')
     } finally {
       setIsLoading(false)
     }
