@@ -2,6 +2,31 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  :root {
+    --background: 220 30% 5%;
+    --foreground: 0 0% 98%;
+    --card: 220 30% 8%;
+    --card-foreground: 0 0% 98%;
+    --popover: 220 30% 8%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 157 73% 82%;
+    --primary-foreground: 220 30% 5%;
+    --secondary: 220 30% 12%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 220 30% 12%;
+    --muted-foreground: 0 0% 60%;
+    --accent: 220 30% 15%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 220 30% 15%;
+    --input: 220 30% 15%;
+    --ring: 157 73% 82%;
+    --radius: 0.5rem;
+  }
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;

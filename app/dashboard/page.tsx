@@ -6,11 +6,38 @@ import { createSupabaseClient } from '@/utils/supabase/client'
 import { logOut } from '@/actions/auth'
 import { User } from '@supabase/supabase-js'
 import { useRouter } from 'next/navigation'
+import { BudgetMetric } from '@/components/dashboard/BudgetMetric'
+import { CategoryChart } from '@/components/dashboard/CategoryChart'
+import { WeeklyTrendChart } from '@/components/dashboard/WeeklyTrendChart'
+import { ExpenseSummary } from '@/components/dashboard/ExpenseSummary'
+import { AddTransactionForm } from '@/components/dashboard/AddTransactionForm'
+import { useTransactions } from '@/hooks/useTransactions'
+import { useBudget } from '@/hooks/useBudget'
 
 export default function DashboardPage() {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const router = useRouter()
+
+  const {
+    transactions,
+    loading: transactionsLoading,
+    error: transactionsError,
+    totalSpent,
+    totalIncome,
+    todayExpenses,
+    weekExpenses,
+    monthExpenses,
+    expensesByCategory,
+    weeklyTrend,
+    refetch: refetchTransactions
+  } = useTransactions()
+
+  const {
+    totalBudget,
+    loading: budgetLoading,
+    saveBudget
+  } = useBudget()
 
   useEffect(() => {
     const supabase = createSupabaseClient()
@@ -43,120 +70,180 @@ export default function DashboardPage() {
   const handleLogout = async () => {
     try {
       await logOut()
+      router.push('/')
     } catch (error) {
       console.error('Error al cerrar sesión:', error)
     }
   }
 
-  if (isLoading) {
+  const handleBudgetUpdate = async (newBudget: number) => {
+    await saveBudget(newBudget)
+  }
+
+  const handleCategoryClick = (category: string) => {
+    console.log('Categoría seleccionada:', category)
+    // TODO: Implementar filtrado por categoría
+  }
+
+  const handleWeekClick = (week: string) => {
+    console.log('Semana seleccionada:', week)
+    // TODO: Implementar drill-down semanal
+  }
+
+  const handleTransactionAdded = () => {
+    // Recargar transacciones cuando se añade una nueva
+    refetchTransactions()
+  }
+
+  if (isLoading || transactionsLoading || budgetLoading) {
     return (
-      <div className='min-h-screen bg-[#0D1D35] flex items-center justify-center'>
-        <div className='text-white text-xl'>Cargando...</div>
+      <div className="min-h-screen bg-[#0D1D35] flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#9DFAD7] mx-auto mb-4"></div>
+          <p className="text-white/70">Cargando dashboard...</p>
+        </div>
       </div>
     )
   }
 
-  if (!user) {
-    return null // El hook useEffect se encarga de la redirección
-  }
-
-  return (
-    <main className='min-h-screen bg-[#0D1D35]'>
-      {/* Navigation */}
-      <nav className='sticky top-0 z-50 bg-[#0D1D35]/95 backdrop-blur-sm border-b border-white/10 container mx-auto px-4 py-4 md:py-6 flex justify-between items-center'>
-        <Link href='/' className='text-xl md:text-2xl font-bold text-white hover:text-[#9DFAD7] transition-colors'>
-          FinancIA
-        </Link>
-        <div className='flex items-center space-x-4 md:space-x-6'>
-          <span className='text-white/80 text-sm md:text-base'>
-            Hola, {user.user_metadata?.name || user.email}
-          </span>
-          <Link href='/' className='text-white hover:text-[#9DFAD7] transition-colors text-sm md:text-base'>
-            Inicio
-          </Link>
+  if (transactionsError) {
+    return (
+      <div className="min-h-screen bg-[#0D1D35] flex items-center justify-center">
+        <div className="text-center max-w-md">
+          <h1 className="text-xl font-bold text-white mb-4">Error al cargar los datos</h1>
+          <p className="text-white/70 mb-6">
+            {transactionsError}
+          </p>
           <button
-            onClick={handleLogout}
-            className='text-white hover:text-red-400 transition-colors text-sm md:text-base'
+            onClick={() => {
+              refetchTransactions()
+              window.location.reload()
+            }}
+            className="bg-[#9DFAD7] text-[#0D1D35] px-6 py-2 rounded-lg hover:bg-[#9DFAD7]/90 transition-colors"
           >
-            Cerrar Sesión
+            Reintentar
           </button>
         </div>
-      </nav>
+      </div>
+    )
+  }
 
-      {/* Dashboard Content */}
-      <section className='container mx-auto px-4 py-8 md:py-12'>
-        <div className='max-w-4xl mx-auto'>
-          <div className='text-center mb-8'>
-            <h1 className='text-3xl md:text-4xl font-bold text-white mb-4'>
-              ¡Bienvenido a tu Dashboard!
-            </h1>
-            <p className='text-white/80 text-base md:text-lg'>
-              Aquí podrás gestionar tus finanzas con FinancIA
-            </p>
-          </div>
+  // Verificar si es usuario nuevo (sin transacciones)
+  const isNewUser = transactions.length === 0
 
-          {/* Dashboard Cards */}
-          <div className='grid md:grid-cols-2 lg:grid-cols-3 gap-6'>
-            <div className='bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-6'>
-              <h3 className='text-xl font-semibold text-white mb-4'>
-                Perfil
-              </h3>
-              <p className='text-white/80 mb-4'>
-                Gestiona tu información personal
-              </p>
-              <div className='space-y-2'>
-                <p className='text-white/60 text-sm'>
-                  <span className='font-medium'>Email:</span> {user.email}
-                </p>
-                <p className='text-white/60 text-sm'>
-                  <span className='font-medium'>ID:</span> {user.id.slice(0, 8)}...
-                </p>
-              </div>
+  return (
+    <div className="min-h-screen bg-[#0D1D35]">
+      {/* Header */}
+      <header className="border-b border-white/10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-6">
+            <div className="flex items-center">
+              <Link href="/" className="text-2xl font-bold text-white hover:text-[#9DFAD7] transition-colors">
+                FinancIA
+              </Link>
             </div>
-
-            <div className='bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-6'>
-              <h3 className='text-xl font-semibold text-white mb-4'>
-                Finanzas
-              </h3>
-              <p className='text-white/80 mb-4'>
-                Conecta tu WhatsApp y comienza a gestionar tus finanzas
-              </p>
-              <button className='bg-gradient-to-r from-[#9DFAD7] to-[#D4FFB5] text-[#0D1D35] font-semibold py-2 px-4 rounded-lg hover:opacity-90 transition-all duration-300 text-sm'>
-                Conectar WhatsApp
+            
+            <div className="flex items-center space-x-6">
+              <span className="text-white/80 hidden md:block">
+                Hola, {user?.user_metadata?.name || user?.email}
+              </span>
+              <AddTransactionForm onTransactionAdded={handleTransactionAdded} />
+              <button
+                onClick={handleLogout}
+                className="text-white/70 hover:text-red-400 transition-colors"
+              >
+                Cerrar Sesión
               </button>
-            </div>
-
-            <div className='bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-6'>
-              <h3 className='text-xl font-semibold text-white mb-4'>
-                Configuración
-              </h3>
-              <p className='text-white/80 mb-4'>
-                Personaliza tu experiencia con FinancIA
-              </p>
-              <button className='bg-white/10 text-white font-semibold py-2 px-4 rounded-lg hover:bg-white/20 transition-all duration-300 text-sm'>
-                Configurar
-              </button>
-            </div>
-          </div>
-
-          {/* Supabase Integration Info */}
-          <div className='mt-12 bg-gradient-to-r from-[#9DFAD7]/10 to-[#D4FFB5]/10 border border-[#9DFAD7]/20 rounded-xl p-6'>
-            <h3 className='text-xl font-semibold text-white mb-4'>
-              🚀 Sistema de Autenticación Supabase Integrado
-            </h3>
-            <p className='text-white/80 mb-4'>
-              El sistema de autenticación de tu amigo está completamente integrado y funcionando.
-            </p>
-            <div className='space-y-2 text-sm text-white/60'>
-              <p>✅ Autenticación con @supabase/ssr</p>
-              <p>✅ Server Actions para login/registro</p>
-              <p>✅ Middleware de protección de rutas</p>
-              <p>✅ Gestión de sesiones con cookies</p>
-              <p>✅ Navegación dinámica</p>
             </div>
           </div>
         </div>
-      </section>
-    </main>
+      </header>
+
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
+        {/* Métrica 1: Balance/Presupuesto principal - 40% del viewport */}
+        <div className="mb-8" style={{ minHeight: '40vh' }}>
+          <BudgetMetric
+            totalBudget={totalBudget}
+            spentAmount={totalSpent}
+            totalIncome={totalIncome}
+            onBudgetUpdate={handleBudgetUpdate}
+            isNewUser={isNewUser}
+          />
+        </div>
+
+        {/* Resumen de Gastos - Solo si hay transacciones */}
+        {!isNewUser && (
+          <div className="mb-8">
+            <ExpenseSummary
+              todayExpenses={todayExpenses}
+              weekExpenses={weekExpenses}
+              monthExpenses={monthExpenses}
+              totalExpenses={totalSpent}
+            />
+          </div>
+        )}
+
+        {/* Métricas 2 y 3: Grid responsivo - Solo si hay transacciones */}
+        {!isNewUser && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
+            {/* Métrica 2: Gastos por categoría - bottom-left */}
+            <div className="order-1">
+              <CategoryChart
+                expensesByCategory={expensesByCategory}
+                onCategoryClick={handleCategoryClick}
+              />
+            </div>
+
+            {/* Métrica 3: Tendencia semanal - bottom-right */}
+            <div className="order-2">
+              <WeeklyTrendChart
+                weeklyData={weeklyTrend}
+                onWeekClick={handleWeekClick}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Resumen de estadísticas generales - Solo si hay transacciones */}
+        {!isNewUser && (
+          <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 text-center border border-white/20">
+              <h4 className="text-white/70 text-sm font-medium">Total Ingresos</h4>
+              <p className="text-2xl font-bold text-green-400 mt-2">
+                {new Intl.NumberFormat('es-CO', {
+                  style: 'currency',
+                  currency: 'COP',
+                  minimumFractionDigits: 0,
+                }).format(totalIncome)}
+              </p>
+            </div>
+            
+            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 text-center border border-white/20">
+              <h4 className="text-white/70 text-sm font-medium">Total Gastos</h4>
+              <p className="text-2xl font-bold text-red-400 mt-2">
+                {new Intl.NumberFormat('es-CO', {
+                  style: 'currency',
+                  currency: 'COP',
+                  minimumFractionDigits: 0,
+                }).format(totalSpent)}
+              </p>
+            </div>
+            
+            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 text-center border border-white/20">
+              <h4 className="text-white/70 text-sm font-medium">Balance</h4>
+              <p className={`text-2xl font-bold mt-2 ${
+                totalIncome - totalSpent >= 0 ? 'text-green-400' : 'text-red-400'
+              }`}>
+                {new Intl.NumberFormat('es-CO', {
+                  style: 'currency',
+                  currency: 'COP',
+                  minimumFractionDigits: 0,
+                }).format(totalIncome - totalSpent)}
+              </p>
+            </div>
+          </div>
+        )}
+      </main>
+    </div>
   )
 } 
