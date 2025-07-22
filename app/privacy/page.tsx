@@ -147,9 +147,11 @@ export default function PrivacyPage() {
               <p className="text-gray-300 mb-6">
                 Para ejercer sus derechos o hacer consultas sobre privacidad:
                 <br />
-                <strong>Email:</strong> privacy@financia.com
+                <strong>Email:</strong> colombiaia.financia@gmail.com
                 <br />
-                <strong>Oficial de Protección de Datos:</strong> dpo@financia.com
+                <strong>Teléfono:</strong> +57 3223796302
+                <br />
+                <strong>Oficial de Protección de Datos:</strong> colombiaia.financia@gmail.com
                 <br />
                 <strong>Dirección:</strong> Bogotá, Colombia
                 <br /><br />

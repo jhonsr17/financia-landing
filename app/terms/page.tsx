@@ -104,7 +104,9 @@ export default function TermsPage() {
               <p className="text-gray-300 mb-6">
                 Si tiene preguntas sobre estos Términos y Condiciones, puede contactarnos en:
                 <br />
-                Email: legal@financia.com
+                Email: colombiaia.financia@gmail.com
+                <br />
+                Teléfono: +57 3223796302
                 <br />
                 Dirección: Bogotá, Colombia
               </p>
