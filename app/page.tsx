@@ -6,7 +6,6 @@ import FeaturesGrid from '@/components/FeaturesGrid'
 import PricingSection from '@/components/PricingSection'
 import { AuthNavigation } from '@/components/AuthNavigation'
 import { TermsAndConditions } from '@/components/TermsAndConditions'
-import { PrivacyPolicy } from '@/components/PrivacyPolicy'
 
 export default function Home() {
   return (
@@ -90,7 +89,7 @@ export default function Home() {
         <div className='absolute inset-0 bg-gradient-to-b from-[#0D1D35]/90 to-[#0D1D35]'></div>
         <div className='absolute inset-0 bg-[url("/grid.svg")] opacity-5'></div>
         <div className='container mx-auto px-4 relative'>
-          <div className='grid md:grid-cols-4 gap-8 md:gap-12'>
+          <div className='grid md:grid-cols-3 gap-8 md:gap-12'>
             <div className='space-y-3 md:space-y-4'>
               <h3 className='text-xl md:text-2xl font-bold bg-gradient-to-r from-[#9DFAD7] to-[#D4FFB5] text-transparent bg-clip-text'>FinancIA</h3>
               <p className='text-white/70 text-sm md:text-base leading-relaxed'>Transformando la manera en que manejas tu dinero, un mensaje a la vez.</p>
@@ -101,13 +100,9 @@ export default function Home() {
                 <a href='#inicio' className='block text-white/70 hover:text-[#9DFAD7] transition-colors text-sm md:text-base'>Inicio</a>
                 <a href='#producto' className='block text-white/70 hover:text-[#9DFAD7] transition-colors text-sm md:text-base'>Producto</a>
                 <a href='#waitlist' className='block text-white/70 hover:text-[#9DFAD7] transition-colors text-sm md:text-base'>Únete</a>
-              </div>
-            </div>
-            <div className='space-y-3 md:space-y-4'>
-              <h4 className='text-base md:text-lg font-semibold text-[#9DFAD7]'>Legal</h4>
-              <div className='space-y-2'>
-                <TermsAndConditions />
-                <PrivacyPolicy />
+                <div className='pt-2'>
+                  <TermsAndConditions />
+                </div>
               </div>
             </div>
             <div className='space-y-3 md:space-y-4'>
@@ -132,12 +127,7 @@ export default function Home() {
           </div>
           <div className='border-t border-white/10 pt-6 md:pt-8 text-center'>
             <p className='text-white/70 text-sm md:text-base'>© 2025 FinancIA. Todos los derechos reservados.</p>
-            <div className='flex flex-wrap justify-center items-center gap-4 mt-3'>
-              <TermsAndConditions />
-              <span className='text-white/50'>•</span>
-              <PrivacyPolicy />
-            </div>
-            <p className='text-white/70 mt-3 text-sm md:text-base'>Hecho con <span className='text-[#9DFAD7]'>❤️</span> en Colombia <span className='ml-1'>🇨🇴</span></p>
+            <p className='text-white/70 mt-2 text-sm md:text-base'>Hecho con <span className='text-[#9DFAD7]'>❤️</span> en Colombia <span className='ml-1'>🇨🇴</span></p>
           </div>
         </div>
       </footer>
