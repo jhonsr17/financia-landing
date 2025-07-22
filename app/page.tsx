@@ -5,8 +5,7 @@ import StatsSection from '@/components/StatsSection'
 import FeaturesGrid from '@/components/FeaturesGrid'
 import PricingSection from '@/components/PricingSection'
 import { AuthNavigation } from '@/components/AuthNavigation'
-import { TermsAndConditions } from '@/components/TermsAndConditions'
-import { PrivacyPolicy } from '@/components/PrivacyPolicy'
+
 
 export default function Home() {
   return (
@@ -102,8 +101,12 @@ export default function Home() {
                 <a href='#producto' className='block text-white/70 hover:text-[#9DFAD7] transition-colors text-sm md:text-base'>Producto</a>
                 <a href='#waitlist' className='block text-white/70 hover:text-[#9DFAD7] transition-colors text-sm md:text-base'>Únete</a>
                 <div className='pt-2 space-y-2'>
-                  <TermsAndConditions />
-                  <PrivacyPolicy />
+                  <a href='/terms' className='block text-white/70 hover:text-[#9DFAD7] transition-colors text-sm md:text-base'>
+                    Términos y Condiciones
+                  </a>
+                  <a href='/privacy' className='block text-white/70 hover:text-[#9DFAD7] transition-colors text-sm md:text-base'>
+                    Política de Privacidad
+                  </a>
                 </div>
               </div>
             </div>

@@ -161,11 +161,11 @@ export const RegisterForm = () => {
           />
           <label htmlFor='terms' className='ml-2 text-white/80 text-sm'>
             Acepto los{' '}
-            <a href='#terms' className='text-[#9DFAD7] hover:text-[#D4FFB5] transition-colors'>
+            <a href='/terms' target='_blank' rel='noopener noreferrer' className='text-[#9DFAD7] hover:text-[#D4FFB5] transition-colors underline'>
               términos y condiciones
             </a>
             {' '}y la{' '}
-            <a href='#privacy' className='text-[#9DFAD7] hover:text-[#D4FFB5] transition-colors'>
+            <a href='/privacy' target='_blank' rel='noopener noreferrer' className='text-[#9DFAD7] hover:text-[#D4FFB5] transition-colors underline'>
               política de privacidad
             </a>
           </label>
