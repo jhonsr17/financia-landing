@@ -35,4 +35,8 @@ next-env.d.ts
 
 # Google credentials
 google-credentials.json
-*credentials*.json finan/ 
+*credentials*.json
+
+# Exclude nested projects
+finan/
+financia-whats-app-insight/ 
