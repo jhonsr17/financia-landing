@@ -26,13 +26,12 @@ export const AddTransactionForm = ({ onTransactionAdded }: AddTransactionFormPro
 
   // Categorías predefinidas
   const gastosCategories = [
-    'Comida', 'Transporte', 'Entretenimiento', 'Compras', 'Servicios',
-    'Salud', 'Educación', 'Hogar', 'Ropa', 'Tecnología', 'Viajes', 'Otros'
+    'Alimentación', 'Vivienda', 'Transporte', 'Educación', 'Entretenimiento y Ocio',
+    'Deudas', 'Compras personales', 'Salud', 'Otros'
   ]
 
   const ingresosCategories = [
-    'Salario', 'Freelance', 'Ventas', 'Inversiones', 'Bonos',
-    'Devoluciones', 'Regalos', 'Alquiler', 'Intereses', 'Otros'
+    'Salario', 'Bonificaciones', 'Arriendo', 'Extras', 'Regalos'
   ]
 
   const currentCategories = tipo === 'gasto' ? gastosCategories : ingresosCategories

@@ -53,23 +53,23 @@ const StatsSection = () => {
                 </div>
               </div>
 
-              {/* Transporte - 17.3% */}
+              {/* Vivienda - 18.5% */}
               <div className="col-span-2 row-span-2 bg-blue-500/80 rounded-xl md:rounded-2xl p-3 md:p-4 flex flex-col justify-between">
                 <div className="flex items-center gap-1 md:gap-2">
-                  <span className="text-white text-sm md:text-base">🚗</span>
-                  <span className="text-white text-xs md:text-sm font-medium">Transporte</span>
+                  <span className="text-white text-sm md:text-base">🏠</span>
+                  <span className="text-white text-xs md:text-sm font-medium">Vivienda</span>
                 </div>
                 <div>
-                  <p className="text-white text-sm md:text-lg font-bold leading-tight">$320.000</p>
-                  <p className="text-white/80 text-xs md:text-sm">17.3%</p>
+                  <p className="text-white text-sm md:text-lg font-bold leading-tight">$342.000</p>
+                  <p className="text-white/80 text-xs md:text-sm">18.5%</p>
                 </div>
               </div>
 
-              {/* Entretenimiento - 15.1% */}
-              <div className="col-span-1 md:col-span-2 bg-purple-500/80 rounded-xl md:rounded-2xl p-3 md:p-4 flex flex-col justify-between">
+              {/* Transporte - 15.1% */}
+              <div className="col-span-1 md:col-span-2 bg-cyan-500/80 rounded-xl md:rounded-2xl p-3 md:p-4 flex flex-col justify-between">
                 <div className="flex items-center gap-1 md:gap-2">
-                  <span className="text-white text-sm md:text-base">🎮</span>
-                  <span className="text-white text-xs md:text-sm font-medium">Entret.</span>
+                  <span className="text-white text-sm md:text-base">🚗</span>
+                  <span className="text-white text-xs md:text-sm font-medium">Transporte</span>
                 </div>
                 <div>
                   <p className="text-white text-sm md:text-lg font-bold leading-tight">$280.000</p>
@@ -77,26 +77,26 @@ const StatsSection = () => {
                 </div>
               </div>
 
-              {/* Compras - 13.0% */}
-              <div className="col-span-1 md:col-span-2 bg-green-500/80 rounded-xl md:rounded-2xl p-3 md:p-4 flex flex-col justify-between">
+              {/* Educación - 12.8% */}
+              <div className="col-span-1 md:col-span-2 bg-amber-500/80 rounded-xl md:rounded-2xl p-3 md:p-4 flex flex-col justify-between">
                 <div className="flex items-center gap-1 md:gap-2">
-                  <span className="text-white text-sm md:text-base">🛍️</span>
-                  <span className="text-white text-xs md:text-sm font-medium">Compras</span>
+                  <span className="text-white text-sm md:text-base">📚</span>
+                  <span className="text-white text-xs md:text-sm font-medium">Educación</span>
                 </div>
                 <div>
-                  <p className="text-white text-sm md:text-lg font-bold leading-tight">$240.000</p>
-                  <p className="text-white/80 text-xs md:text-sm">13.0%</p>
+                  <p className="text-white text-sm md:text-lg font-bold leading-tight">$237.000</p>
+                  <p className="text-white/80 text-xs md:text-sm">12.8%</p>
                 </div>
               </div>
 
-              {/* Servicios - 9.7% */}
-              <div className="col-span-1 bg-yellow-500/80 rounded-xl md:rounded-2xl p-3 md:p-4 flex flex-col justify-between">
+              {/* Entretenimiento y Ocio - 10.2% */}
+              <div className="col-span-1 bg-purple-500/80 rounded-xl md:rounded-2xl p-3 md:p-4 flex flex-col justify-between">
                 <div className="flex items-center gap-1 md:gap-2">
-                  <span className="text-white text-sm md:text-base">📱</span>
+                  <span className="text-white text-sm md:text-base">🎮</span>
                 </div>
                 <div>
-                  <p className="text-white text-xs md:text-sm font-bold leading-tight">$180.000</p>
-                  <p className="text-white/80 text-xs md:text-sm">9.7%</p>
+                  <p className="text-white text-xs md:text-sm font-bold leading-tight">$189.000</p>
+                  <p className="text-white/80 text-xs md:text-sm">10.2%</p>
                 </div>
               </div>
 

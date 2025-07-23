@@ -33,13 +33,20 @@ export interface BudgetCreate {
 }
 
 export type TransactionCategory = 
-  | 'Comida'
+  | 'Alimentación'
+  | 'Vivienda'
   | 'Transporte' 
-  | 'Entretenimiento'
-  | 'Compras'
-  | 'Servicios'
+  | 'Educación'
+  | 'Entretenimiento y Ocio'
+  | 'Deudas'
+  | 'Compras personales'
   | 'Salud'
   | 'Otros'
+  | 'Salario'
+  | 'Bonificaciones'
+  | 'Arriendo'
+  | 'Extras'
+  | 'Regalos'
 
 export interface CategorySummary {
   categoria: TransactionCategory

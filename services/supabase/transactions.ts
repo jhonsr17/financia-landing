@@ -35,13 +35,20 @@ export class TransactionService {
     
     // Colores para cada categoría
     const categoryColors: Record<TransactionCategory, string> = {
-      'Comida': '#ff6b6b',
+      'Alimentación': '#ff6b6b',
+      'Vivienda': '#45b7d1',
       'Transporte': '#4ecdc4',
-      'Entretenimiento': '#45b7d1',
-      'Compras': '#f9ca24',
-      'Servicios': '#6c5ce7',
+      'Educación': '#f9ca24',
+      'Entretenimiento y Ocio': '#6c5ce7',
+      'Deudas': '#e74c3c',
+      'Compras personales': '#f39c12',
       'Salud': '#a29bfe',
-      'Otros': '#a0a0a0'
+      'Otros': '#a0a0a0',
+      'Salario': '#27ae60',
+      'Bonificaciones': '#2ecc71',
+      'Arriendo': '#3498db',
+      'Extras': '#9b59b6',
+      'Regalos': '#e67e22'
     }
 
     // Agrupar por categoría
