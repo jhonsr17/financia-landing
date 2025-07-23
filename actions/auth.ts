@@ -58,14 +58,21 @@ export async function logIn(formData: FormData) {
 }
 
 export async function signUp(formData: FormData) {
+  const name = formData.get("name") as string;
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
   const repeatPassword = formData.get("repeatPassword") as string;
 
   // Validaciones básicas
-  if (!email || !password || !repeatPassword) {
+  if (!name || !email || !password || !repeatPassword) {
     return {
       error: "Por favor completa todos los campos"
+    };
+  }
+
+  if (name.trim().length < 2) {
+    return {
+      error: "El nombre debe tener al menos 2 caracteres"
     };
   }
 
@@ -90,9 +97,15 @@ export async function signUp(formData: FormData) {
   const supabase = await createSupabaseClient();
 
   try {
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        data: {
+          full_name: name.trim(),
+          display_name: name.trim()
+        }
+      }
     });
 
     if (error) {
