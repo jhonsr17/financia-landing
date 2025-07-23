@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { createSupabaseClient } from '@/utils/supabase/client'
-import { useTransactions } from '@/hooks/useTransactions'
+import { useTransactionsUnified } from '@/hooks/useTransactionsUnified'
 
 interface AddTransactionFormProps {
   onTransactionAdded?: () => void
@@ -21,7 +21,7 @@ export const AddTransactionForm = ({ onTransactionAdded }: AddTransactionFormPro
   const [categoria, setCategoria] = useState('')
   const [descripcion, setDescripcion] = useState('')
 
-  const { user } = useTransactions()
+  const { user } = useTransactionsUnified()
   const supabase = createSupabaseClient()
 
   // Categorías predefinidas
@@ -60,22 +60,40 @@ export const AddTransactionForm = ({ onTransactionAdded }: AddTransactionFormPro
     setIsLoading(true)
 
     try {
-      const { error } = await supabase
+      // Usar la estructura unificada
+      const transactionData = {
+        user_id: user.id,
+        monto: valorNumerico,
+        categoria,
+        descripcion: descripcion || null,
+        fecha: new Date().toISOString().split('T')[0],
+        tipo
+      }
+
+      console.log('Guardando transacción:', transactionData)
+
+      const { data, error } = await supabase
         .from('transacciones')
-        .insert({
-          usuario_id: user.id,
-          tipo,
-          valor: valorNumerico,
-          categoria,
-          descripcion: descripcion || null,
-          creado_en: new Date().toISOString()
-        })
+        .insert(transactionData)
+        .select()
 
       if (error) {
         console.error('Error al guardar transacción:', error)
-        alert('Error al guardar la transacción')
+        
+        // Mensajes de error más específicos
+        if (error.code === '23505') {
+          alert('Error: Esta transacción ya existe')
+        } else if (error.code === '23503') {
+          alert('Error: Problema de integridad de datos')
+        } else if (error.code === '42P01') {
+          alert('Error: Problema de configuración de base de datos')
+        } else {
+          alert(`Error al guardar la transacción: ${error.message}`)
+        }
         return
       }
+
+      console.log('Transacción guardada:', data)
 
       // Éxito
       console.log('Transacción guardada exitosamente')

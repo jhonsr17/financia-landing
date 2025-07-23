@@ -13,7 +13,7 @@ import { ExpenseSummary } from '@/components/dashboard/ExpenseSummary'
 import { AddTransactionForm } from '@/components/dashboard/AddTransactionForm'
 import { CategoryBudgetTable } from '@/components/dashboard/CategoryBudgetTable'
 import { BudgetSetupModal } from '@/components/dashboard/BudgetSetupModal'
-import { useTransactions } from '@/hooks/useTransactions'
+import { useTransactionsUnified } from '@/hooks/useTransactionsUnified'
 import { useBudget } from '@/hooks/useBudget'
 
 export default function DashboardPage() {
@@ -34,7 +34,7 @@ export default function DashboardPage() {
     expensesByCategory,
     weeklyTrend,
     refetch: refetchTransactions
-  } = useTransactions()
+  } = useTransactionsUnified()
 
   const {
     totalBudget,

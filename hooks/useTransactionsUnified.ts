@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { createSupabaseClient } from '@/utils/supabase/client'
 import { User } from '@supabase/supabase-js'
 
-export interface Transaction {
+export interface UnifiedTransaction {
   id: string
   user_id: string
   monto: number
@@ -16,8 +16,8 @@ export interface Transaction {
   updated_at: string | null
 }
 
-export const useTransactions = () => {
-  const [transactions, setTransactions] = useState<Transaction[]>([])
+export const useTransactionsUnified = () => {
+  const [transactions, setTransactions] = useState<UnifiedTransaction[]>([])
   const [loading, setLoading] = useState(true)
   const [user, setUser] = useState<User | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -43,6 +43,8 @@ export const useTransactions = () => {
       setLoading(true)
       setError(null)
       
+      console.log('Cargando transacciones para usuario:', user.id)
+      
       const { data, error } = await supabase
         .from('transacciones')
         .select('*')
@@ -51,8 +53,34 @@ export const useTransactions = () => {
 
       if (error) {
         console.error('Error fetching transactions:', error)
-        setError(error.message)
-        setTransactions([])
+        
+        // Intentar con la estructura alternativa si falla
+        const { data: altData, error: altError } = await supabase
+          .from('transacciones')
+          .select('*')
+          .eq('usuario_id', user.id)
+          .order('creado_en', { ascending: false })
+        
+        if (altError) {
+          console.error('Error with alternative structure:', altError)
+          setError(`Error al cargar transacciones: ${error.message}`)
+          setTransactions([])
+        } else {
+          console.log('Transacciones cargadas con estructura alternativa:', altData?.length || 0)
+          // Mapear a estructura unificada
+          const mappedData = (altData || []).map(t => ({
+            id: t.id,
+            user_id: t.usuario_id,
+            monto: t.valor || t.monto,
+            categoria: t.categoria,
+            tipo: t.tipo,
+            descripcion: t.descripcion,
+            fecha: t.fecha || t.creado_en?.split('T')[0],
+            created_at: t.creado_en || t.created_at,
+            updated_at: t.updated_at
+          }))
+          setTransactions(mappedData)
+        }
       } else {
         console.log('Transacciones cargadas:', data?.length || 0)
         setTransactions(data || [])
@@ -72,14 +100,14 @@ export const useTransactions = () => {
       
       // Suscribirse a cambios en tiempo real
       const subscription = supabase
-        .channel('transacciones_changes')
+        .channel('transacciones_unified')
         .on(
           'postgres_changes',
           {
             event: '*',
             schema: 'public',
             table: 'transacciones',
-            filter: `usuario_id=eq.${user.id}`
+            filter: `user_id=eq.${user.id}`
           },
           () => {
             console.log('Cambio detectado en transacciones, recargando...')
@@ -93,12 +121,6 @@ export const useTransactions = () => {
       }
     }
   }, [user])
-
-  // Función auxiliar para verificar si una fecha está dentro de un rango
-  const isDateInRange = (transactionDate: string, startDate: Date, endDate: Date) => {
-    const tDate = new Date(transactionDate)
-    return tDate >= startDate && tDate <= endDate
-  }
 
   // Cálculos derivados
   const totalSpent = transactions
@@ -119,7 +141,7 @@ export const useTransactions = () => {
     })
     .reduce((sum, t) => sum + (t.monto || 0), 0)
 
-  // Gastos de esta semana (últimos 7 días)
+  // Gastos de esta semana
   const weekExpenses = transactions
     .filter(t => {
       if (!t.created_at || t.tipo !== 'gasto') return false
@@ -133,21 +155,21 @@ export const useTransactions = () => {
   // Gastos de este mes
   const monthExpenses = transactions
     .filter(t => {
-      if (!t.creado_en || t.tipo !== 'gasto') return false
+      if (!t.created_at || t.tipo !== 'gasto') return false
       const today = new Date()
-      const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1)
-      const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0, 23, 59, 59)
-      const transactionDate = new Date(t.creado_en)
-      return transactionDate >= startOfMonth && transactionDate <= endOfMonth
+      const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1)
+      const transactionDate = new Date(t.created_at)
+      return transactionDate >= firstDayOfMonth && transactionDate <= today
     })
-    .reduce((sum, t) => sum + (t.valor || 0), 0)
+    .reduce((sum, t) => sum + (t.monto || 0), 0)
 
   // Gastos por categoría
   const expensesByCategory = transactions
     .filter(t => t.tipo === 'gasto' && t.categoria)
     .reduce((acc, t) => {
-      const category = t.categoria!
-      acc[category] = (acc[category] || 0) + (t.valor || 0)
+      if (t.categoria) {
+        acc[t.categoria] = (acc[t.categoria] || 0) + (t.monto || 0)
+      }
       return acc
     }, {} as Record<string, number>)
 
@@ -157,25 +179,54 @@ export const useTransactions = () => {
     const today = new Date()
     
     for (let i = 3; i >= 0; i--) {
-      const weekStart = new Date(today.getTime() - (i + 1) * 7 * 24 * 60 * 60 * 1000)
-      const weekEnd = new Date(today.getTime() - i * 7 * 24 * 60 * 60 * 1000)
+      const weekStart = new Date(today.getTime() - (i * 7 * 24 * 60 * 60 * 1000))
+      const weekEnd = new Date(weekStart.getTime() + (6 * 24 * 60 * 60 * 1000))
       
-      const weekSpent = transactions
+      const weekTotal = transactions
         .filter(t => {
-          if (!t.creado_en || t.tipo !== 'gasto') return false
-          const transactionDate = new Date(t.creado_en)
-          return transactionDate >= weekStart && transactionDate < weekEnd
+          if (!t.created_at || t.tipo !== 'gasto') return false
+          const transactionDate = new Date(t.created_at)
+          return transactionDate >= weekStart && transactionDate <= weekEnd
         })
-        .reduce((sum, t) => sum + (t.valor || 0), 0)
-
+        .reduce((sum, t) => sum + (t.monto || 0), 0)
+      
       weeks.push({
-        week: i === 0 ? 'Esta semana' : `Sem ${4 - i}`,
-        amount: weekSpent,
-        date: `${weekStart.getDate()}-${weekEnd.getDate()} ${weekStart.toLocaleDateString('es', { month: 'short' })}`
+        amount: weekTotal,
+        date: weekStart.toISOString().split('T')[0],
+        week: `Semana ${4 - i}`
       })
     }
     
     return weeks
+  }
+
+  // Crear nueva transacción
+  const createTransaction = async (transactionData: {
+    monto: number
+    categoria: string
+    tipo: 'gasto' | 'ingreso'
+    descripcion?: string
+  }) => {
+    if (!user) throw new Error('Usuario no autenticado')
+
+    const { data, error } = await supabase
+      .from('transacciones')
+      .insert({
+        user_id: user.id,
+        monto: transactionData.monto,
+        categoria: transactionData.categoria,
+        tipo: transactionData.tipo,
+        descripcion: transactionData.descripcion || null,
+        fecha: new Date().toISOString().split('T')[0]
+      })
+      .select()
+
+    if (error) {
+      console.error('Error creating transaction:', error)
+      throw error
+    }
+
+    return data[0]
   }
 
   return {
@@ -190,6 +241,7 @@ export const useTransactions = () => {
     expensesByCategory,
     weeklyTrend: getWeeklyTrend(),
     refetch: fetchTransactions,
+    createTransaction,
     user
   }
 } 
