@@ -89,6 +89,8 @@ export const useCategoryBudget = (userId: string) => {
     stats,
     loading,
     error,
+    saveBudget: saveCategoryBudget,
+    deleteBudget: deleteCategoryBudget,
     saveCategoryBudget,
     deleteCategoryBudget,
     loadBudgetSummary

@@ -11,7 +11,8 @@ import { CategoryChart } from '@/components/dashboard/CategoryChart'
 import { WeeklyTrendChart } from '@/components/dashboard/WeeklyTrendChart'
 import { ExpenseSummary } from '@/components/dashboard/ExpenseSummary'
 import { AddTransactionForm } from '@/components/dashboard/AddTransactionForm'
-import { CategoryBudgetTable } from '@/components/dashboard/CategoryBudgetTable'
+import { BudgetTable } from '@/components/dashboard/BudgetTable'
+
 import { BudgetSetupModal } from '@/components/dashboard/BudgetSetupModal'
 import { useTransactionsUnified } from '@/hooks/useTransactionsUnified'
 import { useBudget } from '@/hooks/useBudget'
@@ -213,9 +214,9 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {/* Tabla de Presupuesto por Categorías */}
+        {/* Tabla de Presupuesto Visual */}
         <div className="mb-8">
-          <CategoryBudgetTable userId={user?.id || ''} />
+          <BudgetTable />
         </div>
 
         {/* Resumen de estadísticas generales - Solo si hay transacciones */}
