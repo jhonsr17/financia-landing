@@ -4,9 +4,6 @@ import { useState } from 'react'
 import { Edit3, TrendingUp, TrendingDown, DollarSign } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Progress } from '@/components/ui/progress'
 
 interface BudgetMetricProps {
@@ -14,6 +11,7 @@ interface BudgetMetricProps {
   spentAmount: number
   totalIncome: number
   onBudgetUpdate: (newBudget: number) => void
+  onOpenBudgetModal?: () => void
   isNewUser: boolean
 }
 
@@ -21,24 +19,11 @@ export const BudgetMetric = ({
   totalBudget, 
   spentAmount, 
   totalIncome,
-  onBudgetUpdate, 
+  onBudgetUpdate,
+  onOpenBudgetModal, 
   isNewUser 
 }: BudgetMetricProps) => {
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
-  const [editBudget, setEditBudget] = useState(totalBudget.toString())
   const [showTooltip, setShowTooltip] = useState(false)
-
-  const handleSaveBudget = async () => {
-    const newBudget = parseFloat(editBudget)
-    if (isNaN(newBudget) || newBudget <= 0) {
-      alert('Por favor ingresa un presupuesto válido')
-      return
-    }
-
-    await onBudgetUpdate(newBudget)
-    setIsEditModalOpen(false)
-    setEditBudget(newBudget.toString())
-  }
 
   // Si no hay presupuesto configurado, mostrar solo balance de ingresos vs gastos
   if (totalBudget === 0) {
@@ -68,45 +53,15 @@ export const BudgetMetric = ({
               </div>
             </div>
             
-            <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
-              <DialogTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="border-white/20 text-white hover:bg-white/10"
-                  onClick={() => setEditBudget(totalBudget.toString())}
-                >
-                  <Edit3 className="h-4 w-4 mr-2" />
-                  Configurar Presupuesto
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="bg-[#0D1D35] border-white/20">
-                <DialogHeader>
-                  <DialogTitle className="text-white">Configurar Presupuesto Mensual</DialogTitle>
-                </DialogHeader>
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="budget" className="text-white">Presupuesto Mensual (COP)</Label>
-                    <Input
-                      id="budget"
-                      type="number"
-                      value={editBudget}
-                      onChange={(e) => setEditBudget(e.target.value)}
-                      placeholder="2500000"
-                      className="bg-white/10 border-white/20 text-white"
-                    />
-                  </div>
-                  <div className="flex gap-3">
-                    <Button onClick={handleSaveBudget} className="flex-1 bg-[#9DFAD7] text-[#0D1D35] hover:bg-[#9DFAD7]/90">
-                      Guardar
-                    </Button>
-                    <Button variant="outline" onClick={() => setIsEditModalOpen(false)} className="border-white/20 text-white hover:bg-white/10">
-                      Cancelar
-                    </Button>
-                  </div>
-                </div>
-              </DialogContent>
-            </Dialog>
+            <Button
+              variant="outline"
+              size="sm"
+              className="border-white/20 text-white hover:bg-white/10"
+              onClick={onOpenBudgetModal}
+            >
+              <Edit3 className="h-4 w-4 mr-2" />
+              Configurar Presupuesto
+            </Button>
           </div>
 
           {/* Contenido principal */}
@@ -253,43 +208,14 @@ export const BudgetMetric = ({
             </div>
           </div>
           
-          <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
-            <DialogTrigger asChild>
-              <Button
-                variant="outline"
-                size="sm"
-                className="border-white/20 text-white hover:bg-white/10"
-                onClick={() => setEditBudget(totalBudget.toString())}
-              >
-                <Edit3 className="h-4 w-4" />
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="bg-[#0D1D35] border-white/20">
-              <DialogHeader>
-                <DialogTitle className="text-white">Editar Presupuesto Mensual</DialogTitle>
-              </DialogHeader>
-              <div className="space-y-4">
-                <div>
-                  <Label htmlFor="budget" className="text-white">Presupuesto Mensual (COP)</Label>
-                  <Input
-                    id="budget"
-                    type="number"
-                    value={editBudget}
-                    onChange={(e) => setEditBudget(e.target.value)}
-                    className="bg-white/10 border-white/20 text-white"
-                  />
-                </div>
-                <div className="flex gap-3">
-                  <Button onClick={handleSaveBudget} className="flex-1 bg-[#9DFAD7] text-[#0D1D35] hover:bg-[#9DFAD7]/90">
-                    Guardar
-                  </Button>
-                  <Button variant="outline" onClick={() => setIsEditModalOpen(false)} className="border-white/20 text-white hover:bg-white/10">
-                    Cancelar
-                  </Button>
-                </div>
-              </div>
-            </DialogContent>
-          </Dialog>
+          <Button
+            variant="outline"
+            size="sm"
+            className="border-white/20 text-white hover:bg-white/10"
+            onClick={onOpenBudgetModal}
+          >
+            <Edit3 className="h-4 w-4" />
+          </Button>
         </div>
 
         {/* Monto principal */}

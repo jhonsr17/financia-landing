@@ -12,12 +12,14 @@ import { WeeklyTrendChart } from '@/components/dashboard/WeeklyTrendChart'
 import { ExpenseSummary } from '@/components/dashboard/ExpenseSummary'
 import { AddTransactionForm } from '@/components/dashboard/AddTransactionForm'
 import { CategoryBudgetTable } from '@/components/dashboard/CategoryBudgetTable'
+import { BudgetSetupModal } from '@/components/dashboard/BudgetSetupModal'
 import { useTransactions } from '@/hooks/useTransactions'
 import { useBudget } from '@/hooks/useBudget'
 
 export default function DashboardPage() {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [showBudgetModal, setShowBudgetModal] = useState(false)
   const router = useRouter()
 
   const {
@@ -79,6 +81,11 @@ export default function DashboardPage() {
 
   const handleBudgetUpdate = async (newBudget: number) => {
     await saveBudget(newBudget)
+  }
+
+  const handleBudgetSetup = async (newBudget: number) => {
+    await saveBudget(newBudget)
+    setShowBudgetModal(false)
   }
 
   const handleCategoryClick = (category: string) => {
@@ -163,13 +170,14 @@ export default function DashboardPage() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
         {/* Métrica 1: Balance/Presupuesto principal - 40% del viewport */}
         <div className="mb-8" style={{ minHeight: '40vh' }}>
-          <BudgetMetric
-            totalBudget={totalBudget}
-            spentAmount={totalSpent}
-            totalIncome={totalIncome}
-            onBudgetUpdate={handleBudgetUpdate}
-            isNewUser={isNewUser}
-          />
+                        <BudgetMetric
+                totalBudget={totalBudget}
+                spentAmount={totalSpent}
+                totalIncome={totalIncome}
+                onBudgetUpdate={handleBudgetUpdate}
+                onOpenBudgetModal={() => setShowBudgetModal(true)}
+                isNewUser={isNewUser}
+              />
         </div>
 
         {/* Resumen de Gastos - Solo si hay transacciones */}
@@ -250,6 +258,14 @@ export default function DashboardPage() {
           </div>
         )}
       </main>
+
+      {/* Modal de configuración de presupuesto */}
+      <BudgetSetupModal
+        isOpen={showBudgetModal}
+        currentBudget={totalBudget}
+        onClose={() => setShowBudgetModal(false)}
+        onSave={handleBudgetSetup}
+      />
     </div>
   )
 } 

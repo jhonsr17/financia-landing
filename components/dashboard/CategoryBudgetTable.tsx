@@ -115,9 +115,17 @@ export const CategoryBudgetTable = ({ userId }: CategoryBudgetTableProps) => {
   if (error) {
     return (
       <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20">
-        <div className="text-center text-red-400">
-          <p>Error al cargar el presupuesto por categorías</p>
-          <p className="text-sm text-white/60 mt-2">{error}</p>
+        <div className="text-center">
+          <h3 className="text-lg font-semibold text-white mb-4">Presupuesto por Categorías</h3>
+          <div className="text-center text-yellow-400 mb-4">
+            <p>⚠️ Funcionalidad en desarrollo</p>
+            <p className="text-sm text-white/60 mt-2">
+              Pronto podrás gestionar presupuestos por categoría
+            </p>
+          </div>
+          <p className="text-sm text-white/40">
+            Por ahora puedes usar el presupuesto general y ver tus gastos por categoría en los gráficos
+          </p>
         </div>
       </div>
     )

@@ -109,21 +109,43 @@ export async function signUp(formData: FormData) {
     });
 
     if (error) {
+      console.error('Supabase signUp error:', error);
+      
       if (error.message.includes("User already registered")) {
         return { error: "Ya existe una cuenta con este email" };
       }
       if (error.message.includes("Password should be at least 6 characters")) {
         return { error: "La contraseña debe tener al menos 6 caracteres" };
       }
-      return { error: "Error al crear la cuenta. Intenta nuevamente" };
+      if (error.message.includes("Unable to validate email address")) {
+        return { error: "Email no válido. Verifica el formato" };
+      }
+      if (error.message.includes("Password should contain")) {
+        return { error: "La contraseña no cumple con los requisitos de seguridad" };
+      }
+      if (error.message.includes("Email rate limit exceeded")) {
+        return { error: "Demasiados intentos. Espera unos minutos e intenta de nuevo" };
+      }
+      if (error.message.includes("Invalid email")) {
+        return { error: "Email inválido. Usa un formato válido como usuario@ejemplo.com" };
+      }
+      
+      // Log del error completo para debugging
+      console.error('Error completo de Supabase:', {
+        message: error.message,
+        status: error.status
+      });
+      
+      return { error: `Error al crear la cuenta: ${error.message}` };
     }
 
     return {
       success: "Cuenta creada exitosamente. Revisa tu email para confirmarla"
     };
   } catch (error) {
+    console.error('Catch error in signUp:', error);
     return {
-      error: "Error del servidor. Intenta más tarde"
+      error: "Error del servidor. Verifica tu conexión e intenta más tarde"
     };
   }
 }
