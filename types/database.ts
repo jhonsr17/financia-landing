@@ -19,6 +19,32 @@ export interface Budget {
   updated_at: string
 }
 
+// Nueva interfaz para presupuesto por categoría
+export interface CategoryBudget {
+  id: string
+  usuario_id: string
+  categoria_id: string
+  mes: number
+  valor: number
+  created_at: string
+  updated_at: string
+}
+
+export interface CategoryBudgetCreate {
+  categoria_id: string
+  mes: number
+  valor: number
+}
+
+// Nueva interfaz para el resumen de presupuesto por categoría
+export interface CategoryBudgetSummary {
+  categoria: string
+  actual: number
+  presupuestado: number
+  excedente: number
+  porcentaje_usado: number
+}
+
 export interface TransactionCreate {
   monto: number
   categoria: string
