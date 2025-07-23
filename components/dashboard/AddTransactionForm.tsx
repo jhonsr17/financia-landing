@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { createSupabaseClient } from '@/utils/supabase/client'
 import { useTransactionsUnified } from '@/hooks/useTransactionsUnified'
+import { useCategories } from '@/hooks/useCategories'
 
 interface AddTransactionFormProps {
   onTransactionAdded?: () => void
@@ -22,17 +23,18 @@ export const AddTransactionForm = ({ onTransactionAdded }: AddTransactionFormPro
   const [descripcion, setDescripcion] = useState('')
 
   const { user } = useTransactionsUnified()
+  const { gastoCategories, ingresoCategories, loading: categoriesLoading } = useCategories()
   const supabase = createSupabaseClient()
 
-  // Categorías predefinidas
-  const gastosCategories = [
-    'Alimentación', 'Vivienda', 'Transporte', 'Educación', 'Entretenimiento y Ocio',
-    'Deudas', 'Compras personales', 'Salud', 'Otros'
-  ]
+  // Fallback para categorías si no se cargan desde la DB
+  const gastosCategories = gastoCategories.length > 0 
+    ? gastoCategories.map(cat => cat.nombre)
+    : ['Alimentación', 'Vivienda', 'Transporte', 'Educación', 'Entretenimiento y Ocio',
+       'Deudas', 'Compras personales', 'Salud', 'Otros']
 
-  const ingresosCategories = [
-    'Salario', 'Bonificaciones', 'Arriendo', 'Extras', 'Regalos'
-  ]
+  const ingresosCategories = ingresoCategories.length > 0 
+    ? ingresoCategories.map(cat => cat.nombre)
+    : ['Salario', 'Bonificaciones', 'Arriendo', 'Extras', 'Regalos']
 
   const currentCategories = tipo === 'gasto' ? gastosCategories : ingresosCategories
 
@@ -60,14 +62,14 @@ export const AddTransactionForm = ({ onTransactionAdded }: AddTransactionFormPro
     setIsLoading(true)
 
     try {
-      // Usar la estructura unificada
+      // Usar la estructura real de tu base de datos
       const transactionData = {
-        user_id: user.id,
-        monto: valorNumerico,
+        usuario_id: user.id,
+        valor: valorNumerico,
         categoria,
         descripcion: descripcion || null,
-        fecha: new Date().toISOString().split('T')[0],
-        tipo
+        tipo,
+        creado_en: new Date().toISOString()
       }
 
       console.log('Guardando transacción:', transactionData)
