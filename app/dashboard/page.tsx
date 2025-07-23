@@ -216,7 +216,7 @@ export default function DashboardPage() {
 
         {/* Tabla de Presupuesto Visual */}
         <div className="mb-8">
-          <BudgetTable />
+          <BudgetTable userId={user?.id} />
         </div>
 
         {/* Resumen de estadísticas generales - Solo si hay transacciones */}

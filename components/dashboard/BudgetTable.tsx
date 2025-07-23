@@ -10,11 +10,23 @@ import { useTransactions } from '@/hooks/useTransactions'
 import { useCategoryBudget } from '@/hooks/useCategoryBudget'
 import { useCategories } from '@/hooks/useCategories'
 import { Settings, TrendingUp, TrendingDown, DollarSign } from 'lucide-react'
-import { formatCurrency } from '@/utils/format'
+// Función de formateo local
+const formatCurrency = (amount: number): string => {
+  return new Intl.NumberFormat('es-CO', {
+    style: 'currency',
+    currency: 'COP',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(amount)
+}
 
-export const BudgetTable = () => {
-  const { expensesByCategory, totalSpent } = useTransactions()
-  const { budgetSummary, stats, saveBudget, deleteBudget } = useCategoryBudget()
+interface BudgetTableProps {
+  userId?: string
+}
+
+export const BudgetTable = ({ userId }: BudgetTableProps) => {
+  const { expensesByCategory, totalSpent, user } = useTransactions()
+  const { budgetSummary, stats, saveBudget, deleteBudget } = useCategoryBudget(userId || user?.id || '')
   const { gastoCategories } = useCategories()
   
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
