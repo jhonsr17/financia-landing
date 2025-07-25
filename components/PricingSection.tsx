@@ -102,7 +102,7 @@ const PricingSection = () => {
                 whileTap={{ scale: 0.98 }}
                 className="w-full bg-gradient-to-r from-[#9DFAD7] to-[#D4FFB5] hover:from-[#9DFAD7]/90 hover:to-[#D4FFB5]/90 text-[#0D1D35] font-semibold py-4 px-6 rounded-xl transition duration-300 shadow-lg hover:shadow-xl block text-center"
               >
-                Únete a la lista de espera
+                Chatea ya con FinancIA
               </motion.a>
             </div>
           </div>

@@ -183,7 +183,7 @@ export const WaitlistForm = () => {
               Registrando...
             </div>
           ) : (
-            'Asegura tu lugar'
+            'Chatea ya con FinancIA'
           )}
         </button>
 
