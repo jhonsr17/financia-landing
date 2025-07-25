@@ -116,6 +116,22 @@ export async function signUp(formData: FormData) {
       }
     });
 
+    // Si el registro fue exitoso, crear el perfil del usuario
+    if (data.user && !error) {
+      const { error: profileError } = await supabase
+        .from('user_profiles')
+        .insert({
+          id: data.user.id,
+          full_name: name.trim(),
+          phone: phone.trim()
+        });
+
+      if (profileError) {
+        console.warn('Error al crear perfil de usuario:', profileError);
+        // No fallar el registro si hay error en el perfil
+      }
+    }
+
     if (error) {
       console.error('Supabase signUp error:', error);
       
@@ -160,6 +176,11 @@ export async function signUp(formData: FormData) {
 
 export async function logOut() {
   const supabase = await createSupabaseClient();
-  await supabase.auth.signOut();
+  const { error } = await supabase.auth.signOut();
+  
+  if (error) {
+    console.error('Error al cerrar sesión:', error);
+  }
+  
   redirect("/");
 } 

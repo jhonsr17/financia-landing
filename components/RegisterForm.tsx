@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { signUp } from '@/actions/auth'
+import CountryCodeSelector from './CountryCodeSelector'
 
 export const RegisterForm = () => {
   const [error, setError] = useState<string>('')
@@ -10,6 +11,7 @@ export const RegisterForm = () => {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [isSuccessful, setIsSuccessful] = useState(false)
+  const [countryCode, setCountryCode] = useState('+57') // Default to Colombia
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -19,6 +21,11 @@ export const RegisterForm = () => {
     setIsSuccessful(false)
 
     const formData = new FormData(e.currentTarget)
+    // Añadir el código de país al número de teléfono
+    const phoneNumber = formData.get('phone') as string
+    const fullPhone = countryCode + phoneNumber
+    formData.set('phone', fullPhone)
+    
     const form = e.currentTarget // Guardar referencia al formulario
     
     try {
@@ -103,15 +110,24 @@ export const RegisterForm = () => {
             >
               Número de teléfono
             </label>
-            <input
-              type='tel'
-              id='phone'
-              name='phone'
-              required
-              disabled={isLoading}
-              className='w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/50 focus:outline-none focus:border-[#9DFAD7] transition-colors'
-              placeholder='+57 300 123 4567'
-            />
+            <div className='flex'>
+              <CountryCodeSelector
+                value={countryCode}
+                onChange={setCountryCode}
+                disabled={isLoading}
+              />
+              <input
+                type='tel'
+                id='phone'
+                name='phone'
+                required
+                disabled={isLoading}
+                className='flex-1 px-4 py-3 bg-white/5 border border-white/10 rounded-r-lg text-white placeholder-white/50 focus:outline-none focus:border-[#9DFAD7] transition-colors border-l-0'
+                placeholder='300 123 4567'
+                pattern='[0-9\s\-]+'
+                title='Solo números, espacios y guiones'
+              />
+            </div>
           </div>
 
           <div>
