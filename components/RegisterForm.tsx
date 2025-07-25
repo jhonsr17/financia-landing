@@ -14,6 +14,7 @@ export const RegisterForm = () => {
   const [countryCode, setCountryCode] = useState('+57') // Default to Colombia
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    console.log('🚀 FORM SUBMIT - Iniciando proceso de registro')
     e.preventDefault()
     setError('')
     setSuccess('')
@@ -24,12 +25,22 @@ export const RegisterForm = () => {
     // Añadir el código de país al número de teléfono
     const phoneNumber = formData.get('phone') as string
     const fullPhone = countryCode + phoneNumber
+    console.log('📱 FORM SUBMIT - Teléfono:', { countryCode, phoneNumber, fullPhone })
     formData.set('phone', fullPhone)
     
     const form = e.currentTarget // Guardar referencia al formulario
     
+    console.log('📋 FORM SUBMIT - FormData preparado:', {
+      name: formData.get('name'),
+      email: formData.get('email'),
+      phone: formData.get('phone'),
+      password: '***'
+    })
+    
     try {
+      console.log('🔄 FORM SUBMIT - Llamando a signUp...')
       const result = await signUp(formData)
+      console.log('✅ FORM SUBMIT - Resultado:', result)
       
       if (result?.error) {
         setError(result.error)
@@ -44,9 +55,10 @@ export const RegisterForm = () => {
         setError('Error inesperado. Intenta nuevamente')
       }
     } catch (error) {
-      console.error('Error en registro:', error)
+      console.error('❌ FORM SUBMIT - Error catch:', error)
       setError('Error de conexión. Intenta nuevamente')
     } finally {
+      console.log('🏁 FORM SUBMIT - Finalizando proceso')
       setIsLoading(false)
     }
   }
