@@ -64,6 +64,8 @@ export async function signUp(formData: FormData) {
   const password = formData.get("password") as string;
   const repeatPassword = formData.get("repeatPassword") as string;
 
+  console.log('DEBUG - Datos recibidos:', { name, email, phone, password: '***' });
+
   // Validaciones básicas
   if (!name || !email || !phone || !password || !repeatPassword) {
     return {
@@ -116,9 +118,21 @@ export async function signUp(formData: FormData) {
       }
     });
 
+    console.log('DEBUG - Resultado auth.signUp:', { 
+      userId: data.user?.id, 
+      error: error?.message 
+    });
+
     // Si el registro fue exitoso, guardar en la tabla usuarios
     if (data.user && !error) {
-      const { error: userError } = await supabase
+      console.log('DEBUG - Intentando guardar en tabla usuarios:', {
+        id: data.user.id,
+        nombre: name.trim(),
+        gmail: email.trim(),
+        telefono: phone.trim()
+      });
+
+      const { data: insertData, error: userError } = await supabase
         .from('usuarios')
         .insert({
           id: data.user.id,
@@ -127,8 +141,13 @@ export async function signUp(formData: FormData) {
           telefono: phone.trim()
         });
 
+      console.log('DEBUG - Resultado insert usuarios:', { 
+        insertData, 
+        userError: userError?.message 
+      });
+
       if (userError) {
-        console.warn('Error al crear usuario en tabla usuarios:', userError);
+        console.error('Error al crear usuario en tabla usuarios:', userError);
         // No fallar el registro si hay error en la tabla usuarios
       }
     }
