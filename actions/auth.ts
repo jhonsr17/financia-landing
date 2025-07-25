@@ -58,9 +58,10 @@ export async function logIn(formData: FormData) {
 }
 
 export async function signUp(formData: FormData) {
-  // ===== LOGS DE DEBUG INICIALES =====
-  console.log('🚀 SERVER - Función signUp iniciada');
-  console.log('📥 SERVER - FormData recibido:', Array.from(formData.entries()));
+  // ===== LOGS DE DEBUG INICIALES MÁS VISIBLES =====
+  console.log('🚀🚀🚀 SERVER FUNCTION CALLED - signUp iniciada');
+  console.log('📥📥📥 SERVER - FormData recibido:', Array.from(formData.entries()));
+  console.log('⏰⏰⏰ SERVER - Timestamp:', new Date().toISOString());
   
   const name = formData.get("name") as string;
   const email = formData.get("email") as string;
