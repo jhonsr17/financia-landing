@@ -106,14 +106,14 @@ export async function signUp(formData: FormData) {
   const supabase = await createSupabaseClient();
 
   try {
+    // 1. Crear usuario en auth.users - LÓGICA DEL INSIGHTS
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
+        emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/dashboard`,
         data: {
-          full_name: name.trim(),
-          display_name: name.trim(),
-          phone: phone.trim()
+          full_name: name.trim()
         }
       }
     });
@@ -123,32 +123,39 @@ export async function signUp(formData: FormData) {
       error: error?.message 
     });
 
-    // Si el registro fue exitoso, guardar en la tabla usuarios
-    if (data.user && !error) {
-      console.log('DEBUG - Intentando guardar en tabla usuarios:', {
-        id: data.user.id,
-        nombre: name.trim(),
-        gmail: email.trim(),
-        telefono: phone.trim()
-      });
-
-      const { data: insertData, error: userError } = await supabase
-        .from('usuarios')
-        .insert({
+    // 2. Si el registro fue exitoso, usar UPSERT en lugar de INSERT - LÓGICA DEL INSIGHTS
+    if (!error && data.user && (name || phone)) {
+      try {
+        console.log('DEBUG - Intentando UPSERT en tabla usuarios:', {
           id: data.user.id,
           nombre: name.trim(),
           gmail: email.trim(),
           telefono: phone.trim()
         });
 
-      console.log('DEBUG - Resultado insert usuarios:', { 
-        insertData, 
-        userError: userError?.message 
-      });
+        const { data: upsertData, error: userError } = await supabase
+          .from('usuarios')
+          .upsert({
+            id: data.user.id,
+            nombre: name.trim() || null,
+            gmail: email.trim(),
+            telefono: phone.trim() || null
+          }, {
+            onConflict: 'id'
+          });
 
-      if (userError) {
-        console.error('Error al crear usuario en tabla usuarios:', userError);
-        // No fallar el registro si hay error en la tabla usuarios
+        console.log('DEBUG - Resultado UPSERT usuarios:', { 
+          upsertData, 
+          userError: userError?.message 
+        });
+
+        if (userError) {
+          console.error('Error al insertar datos del usuario:', userError);
+          // No fallar el registro, pero loggearlo
+        }
+      } catch (insertError) {
+        console.error('Error al insertar en usuarios:', insertError);
+        // No fallar el registro, pero loggearlo
       }
     }
 

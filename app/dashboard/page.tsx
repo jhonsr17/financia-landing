@@ -149,22 +149,22 @@ export default function DashboardPage() {
           <div className="flex justify-between items-center py-6">
             <div className="flex items-center">
               <Link href="/" className="text-2xl font-bold text-white hover:text-[#9DFAD7] transition-colors">
-                FinancIA
-              </Link>
+          FinancIA
+        </Link>
             </div>
             
             <div className="flex items-center space-x-6">
               <span className="text-white/80 hidden md:block">
                 Hola, {user?.user_metadata?.name || user?.email}
-              </span>
+          </span>
               <AddTransactionForm onTransactionAdded={handleTransactionAdded} />
-              <button
-                onClick={handleLogout}
+          <button
+            onClick={handleLogout}
                 className="text-white/70 hover:text-red-400 transition-colors"
-              >
-                Cerrar Sesión
-              </button>
-            </div>
+          >
+            Cerrar Sesión
+          </button>
+        </div>
           </div>
         </div>
       </header>
@@ -180,7 +180,7 @@ export default function DashboardPage() {
                 onOpenBudgetModal={() => setShowBudgetModal(true)}
                 isNewUser={isNewUser}
               />
-        </div>
+          </div>
 
         {/* Resumen de Gastos - Solo si hay transacciones */}
         {!isNewUser && (
@@ -191,7 +191,7 @@ export default function DashboardPage() {
               monthExpenses={monthExpenses}
               totalExpenses={totalSpent}
             />
-          </div>
+              </div>
         )}
 
         {/* Métricas 2 y 3: Grid responsivo - Solo si hay transacciones */}
@@ -238,7 +238,7 @@ export default function DashboardPage() {
                 }).format(totalIncome)}
               </p>
             </div>
-            
+
             <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 text-center border border-white/20">
               <h4 className="text-white/70 text-sm font-medium">Total Gastos</h4>
               <p className="text-2xl font-bold text-red-400 mt-2">
@@ -248,8 +248,8 @@ export default function DashboardPage() {
                   minimumFractionDigits: 0,
                 }).format(totalSpent)}
               </p>
-            </div>
-            
+          </div>
+
             <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 text-center border border-white/20">
               <h4 className="text-white/70 text-sm font-medium">Balance</h4>
               <p className={`text-2xl font-bold mt-2 ${
@@ -273,6 +273,6 @@ export default function DashboardPage() {
         onClose={() => setShowBudgetModal(false)}
         onSave={handleBudgetSetup}
       />
-    </div>
+        </div>
   )
 } 
