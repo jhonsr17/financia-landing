@@ -25,22 +25,34 @@ export const RegisterForm = () => {
     // Añadir el código de país al número de teléfono
     const phoneNumber = formData.get('phone') as string
     const fullPhone = countryCode + phoneNumber
-    console.log('📱 FORM SUBMIT - Teléfono:', { countryCode, phoneNumber, fullPhone })
+    
+    // LOGS CORREGIDOS PARA MOSTRAR VALORES REALES
+    console.log('📱 FORM SUBMIT - Teléfono:', JSON.stringify({ 
+      countryCode, 
+      phoneNumber, 
+      fullPhone 
+    }))
+    
     formData.set('phone', fullPhone)
     
     const form = e.currentTarget // Guardar referencia al formulario
     
-    console.log('📋 FORM SUBMIT - FormData preparado:', {
+    // LOGS CORREGIDOS PARA MOSTRAR VALORES REALES
+    console.log('📋 FORM SUBMIT - FormData preparado:', JSON.stringify({
       name: formData.get('name'),
       email: formData.get('email'),
       phone: formData.get('phone'),
       password: '***'
-    })
+    }))
     
     try {
       console.log('🔄 FORM SUBMIT - Llamando a signUp...')
+      console.log('📤 FORM SUBMIT - Enviando FormData con entries:', Array.from(formData.entries()))
+      
       const result = await signUp(formData)
-      console.log('✅ FORM SUBMIT - Resultado:', result)
+      
+      // LOGS CORREGIDOS PARA MOSTRAR VALORES REALES
+      console.log('✅ FORM SUBMIT - Resultado:', JSON.stringify(result))
       
       if (result?.error) {
         setError(result.error)
