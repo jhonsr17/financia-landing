@@ -4,7 +4,7 @@ import { MessageCircle } from 'lucide-react'
 import { motion } from 'framer-motion'
 
 const WhatsAppChatButton = () => {
-  const whatsappUrl = "https://wa.me/573227031301?text=¡Hola%20FinancIA!%20Soy%20usuario%20registrado%20y%20quiero%20chatear%20con%20el%20asistente%20financiero%20🚀"
+  const whatsappUrl = "https://wa.me/573227031301?text=¡Hola%20FinancIA!%20Soy%20usuario%20registrado%20y%20quiero%20chatear%20con%20el%20asistente%20financiero%20🚀💰"
 
   return (
     <motion.div
