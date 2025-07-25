@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { signUp } from '@/actions/auth'
 import CountryCodeSelector from './CountryCodeSelector'
 
 export const RegisterForm = () => {
@@ -33,30 +32,45 @@ export const RegisterForm = () => {
       fullPhone 
     }))
     
-    formData.set('phone', fullPhone)
-    
     const form = e.currentTarget // Guardar referencia al formulario
     
+    // Preparar datos para API route
+    const requestData = {
+      name: formData.get('name') as string,
+      email: formData.get('email') as string,
+      phone: fullPhone,
+      password: formData.get('password') as string,
+      repeatPassword: formData.get('repeatPassword') as string
+    }
+    
     // LOGS CORREGIDOS PARA MOSTRAR VALORES REALES
-    console.log('📋 FORM SUBMIT - FormData preparado:', JSON.stringify({
-      name: formData.get('name'),
-      email: formData.get('email'),
-      phone: formData.get('phone'),
-      password: '***'
+    console.log('📋 FORM SUBMIT - Request data preparado:', JSON.stringify({
+      ...requestData,
+      password: '***',
+      repeatPassword: '***'
     }))
     
     try {
-      console.log('🔄 FORM SUBMIT - Llamando a signUp...')
-      console.log('📤 FORM SUBMIT - Enviando FormData con entries:', Array.from(formData.entries()))
+      console.log('🔄 FORM SUBMIT - Llamando a API route /api/auth/register...')
       
-      const result = await signUp(formData)
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData)
+      })
+      
+      console.log('📤 FORM SUBMIT - Response status:', response.status)
+      
+      const result = await response.json()
       
       // LOGS CORREGIDOS PARA MOSTRAR VALORES REALES
       console.log('✅ FORM SUBMIT - Resultado:', JSON.stringify(result))
       
-      if (result?.error) {
-        setError(result.error)
-      } else if (result?.success) {
+      if (!response.ok) {
+        setError(result.error || 'Error al crear la cuenta')
+      } else if (result.success) {
         setSuccess(result.success)
         setIsSuccessful(true)
         // Limpiar formulario después de mostrar éxito
