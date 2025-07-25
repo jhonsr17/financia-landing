@@ -116,19 +116,20 @@ export async function signUp(formData: FormData) {
       }
     });
 
-    // Si el registro fue exitoso, crear el perfil del usuario
+    // Si el registro fue exitoso, guardar en la tabla usuarios
     if (data.user && !error) {
-      const { error: profileError } = await supabase
-        .from('user_profiles')
+      const { error: userError } = await supabase
+        .from('usuarios')
         .insert({
           id: data.user.id,
-          full_name: name.trim(),
-          phone: phone.trim()
+          nombre: name.trim(),
+          gmail: email.trim(),
+          telefono: phone.trim()
         });
 
-      if (profileError) {
-        console.warn('Error al crear perfil de usuario:', profileError);
-        // No fallar el registro si hay error en el perfil
+      if (userError) {
+        console.warn('Error al crear usuario en tabla usuarios:', userError);
+        // No fallar el registro si hay error en la tabla usuarios
       }
     }
 
