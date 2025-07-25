@@ -6,6 +6,11 @@ export async function middleware(request: NextRequest) {
     authRoutesList = ["/login", "/register"];
   const currentPath = new URL(request.url).pathname;
 
+  // Excluir server actions del middleware
+  if (currentPath.startsWith('/_next/') || currentPath.includes('/api/')) {
+    return NextResponse.next();
+  }
+
   const {
     data: { user },
   } = await getUser(request, NextResponse.next());
