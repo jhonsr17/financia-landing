@@ -12,6 +12,7 @@ import { WeeklyTrendChart } from '@/components/dashboard/WeeklyTrendChart'
 import { ExpenseSummary } from '@/components/dashboard/ExpenseSummary'
 import { AddTransactionForm } from '@/components/dashboard/AddTransactionForm'
 import { BudgetTable } from '@/components/dashboard/BudgetTable'
+import WhatsAppChatButton from '@/components/dashboard/WhatsAppChatButton'
 
 import { BudgetSetupModal } from '@/components/dashboard/BudgetSetupModal'
 import { useTransactionsUnified } from '@/hooks/useTransactionsUnified'
@@ -217,6 +218,11 @@ export default function DashboardPage() {
         {/* Tabla de Presupuesto Visual */}
         <div className="mb-8">
           <BudgetTable userId={user?.id} />
+        </div>
+
+        {/* WhatsApp Chat Button */}
+        <div className="mb-8">
+          <WhatsAppChatButton />
         </div>
 
         {/* Resumen de estadísticas generales - Solo si hay transacciones */}

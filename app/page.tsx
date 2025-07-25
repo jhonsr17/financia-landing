@@ -1,5 +1,4 @@
 import { FloatingChat } from '@/components/FloatingChat'
-import { WaitlistForm } from '@/components/WaitlistForm'
 import ChatCarousel from '@/components/ChatCarousel'
 import StatsSection from '@/components/StatsSection'
 import FeaturesGrid from '@/components/FeaturesGrid'
@@ -34,9 +33,7 @@ export default function Home() {
                 Registra, visualiza y recibe consejos inteligentes al instante.
               </p>
               <a
-                href='https://wa.me/573223796302?text=¡Hola%20FinancIA!%20Quiero%20conocer%20más%20sobre%20el%20asistente%20financiero%20🚀'
-                target='_blank'
-                rel='noopener noreferrer'
+                href='/register'
                 className='inline-block bg-gradient-to-r from-[#9DFAD7] to-[#D4FFB5] text-[#0D1D35] font-semibold py-3 px-6 md:px-8 rounded-xl hover:opacity-90 transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-[#9DFAD7]/20 mt-4 md:mt-6 text-sm md:text-base'
               >
                 Chatea ya con FinancIA
@@ -60,28 +57,7 @@ export default function Home() {
         <FeaturesGrid />
       </section>
 
-      {/* CTA Section */}
-      <section id='waitlist' className='py-16 md:py-24 relative overflow-hidden scroll-mt-6'>
-        <div className='absolute inset-0 bg-gradient-to-b from-[#0D1D35] to-[#0D1D35]/90'></div>
-        <div className='absolute inset-0 bg-[url("/grid.svg")] opacity-10'></div>
-        <div className='container mx-auto px-4 relative z-10'>
-          <div className='grid lg:grid-cols-12 gap-8 lg:gap-12 items-center'>
-            <div className='text-left space-y-4 md:space-y-6 lg:col-span-5'>
-              <h2 className='text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-[#9DFAD7] to-[#D4FFB5] text-transparent bg-clip-text leading-tight'>
-                Domina tus finanzas sin ser un experto
-              </h2>
-              <p className='text-lg md:text-xl text-white/80 max-w-xl leading-relaxed'>
-                Sé parte del grupo exclusivo que está transformando su relación con el dinero.
-                Con FinancIA, tus finanzas personales dejan de ser un dolor de cabeza
-                para convertirse en tu mejor aliado hacia la libertad financiera.
-              </p>
-            </div>
-            <div className='lg:col-span-7 md:scale-105 lg:scale-110 transform md:translate-x-2 lg:translate-x-4 transition-all duration-700 hover:scale-[1.08] lg:hover:scale-[1.15]'>
-              <WaitlistForm />
-            </div>
-          </div>
-        </div>
-      </section>
+
 
       {/* Pricing Section */}
       <PricingSection />
@@ -101,7 +77,7 @@ export default function Home() {
               <div className='space-y-2'>
                 <a href='#inicio' className='block text-white/70 hover:text-[#9DFAD7] transition-colors text-sm md:text-base'>Inicio</a>
                 <a href='#producto' className='block text-white/70 hover:text-[#9DFAD7] transition-colors text-sm md:text-base'>Producto</a>
-                <a href='#waitlist' className='block text-white/70 hover:text-[#9DFAD7] transition-colors text-sm md:text-base'>Únete</a>
+                <a href='#plan' className='block text-white/70 hover:text-[#9DFAD7] transition-colors text-sm md:text-base'>Plan</a>
                 <div className='pt-2 space-y-2'>
                   <a href='/terms' className='block text-white/70 hover:text-[#9DFAD7] transition-colors text-sm md:text-base'>
                     Términos y Condiciones

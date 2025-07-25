@@ -98,6 +98,24 @@ export const RegisterForm = () => {
 
           <div>
             <label 
+              htmlFor='phone' 
+              className='block text-white font-medium mb-2'
+            >
+              Número de teléfono
+            </label>
+            <input
+              type='tel'
+              id='phone'
+              name='phone'
+              required
+              disabled={isLoading}
+              className='w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/50 focus:outline-none focus:border-[#9DFAD7] transition-colors'
+              placeholder='+57 300 123 4567'
+            />
+          </div>
+
+          <div>
+            <label 
               htmlFor='password' 
               className='block text-white font-medium mb-2'
             >

@@ -60,11 +60,12 @@ export async function logIn(formData: FormData) {
 export async function signUp(formData: FormData) {
   const name = formData.get("name") as string;
   const email = formData.get("email") as string;
+  const phone = formData.get("phone") as string;
   const password = formData.get("password") as string;
   const repeatPassword = formData.get("repeatPassword") as string;
 
   // Validaciones básicas
-  if (!name || !email || !password || !repeatPassword) {
+  if (!name || !email || !phone || !password || !repeatPassword) {
     return {
       error: "Por favor completa todos los campos"
     };
@@ -79,6 +80,12 @@ export async function signUp(formData: FormData) {
   if (!email.includes("@")) {
     return {
       error: "Por favor ingresa un email válido"
+    };
+  }
+
+  if (!phone || phone.length < 10) {
+    return {
+      error: "Por favor ingresa un número de teléfono válido"
     };
   }
 
@@ -103,7 +110,8 @@ export async function signUp(formData: FormData) {
       options: {
         data: {
           full_name: name.trim(),
-          display_name: name.trim()
+          display_name: name.trim(),
+          phone: phone.trim()
         }
       }
     });
