@@ -100,104 +100,78 @@ export default function DashboardPage() {
     // TODO: Implementar drill-down semanal
   }
 
-  const handleTransactionAdded = () => {
-    // Recargar transacciones cuando se añade una nueva
-    refetchTransactions()
-  }
+  // Determinar si es un usuario nuevo (sin transacciones)
+  const isNewUser = !transactionsLoading && (!transactions || transactions.length === 0)
 
+  // Loading state
   if (isLoading || transactionsLoading || budgetLoading) {
     return (
       <div className="min-h-screen bg-[#0D1D35] flex items-center justify-center">
-        <div className="text-center">
+        <div className="text-white text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#9DFAD7] mx-auto mb-4"></div>
-          <p className="text-white/70">Cargando dashboard...</p>
+          <p className="text-sm sm:text-base">Cargando tu dashboard...</p>
         </div>
       </div>
     )
   }
-
-  if (transactionsError) {
-    return (
-      <div className="min-h-screen bg-[#0D1D35] flex items-center justify-center">
-        <div className="text-center max-w-md">
-          <h1 className="text-xl font-bold text-white mb-4">Error al cargar los datos</h1>
-          <p className="text-white/70 mb-6">
-            {transactionsError}
-          </p>
-          <button
-            onClick={() => {
-              refetchTransactions()
-              window.location.reload()
-            }}
-            className="bg-[#9DFAD7] text-[#0D1D35] px-6 py-2 rounded-lg hover:bg-[#9DFAD7]/90 transition-colors"
-          >
-            Reintentar
-          </button>
-        </div>
-      </div>
-    )
-  }
-
-  // Verificar si es usuario nuevo (sin transacciones)
-  const isNewUser = transactions.length === 0
 
   return (
     <div className="min-h-screen bg-[#0D1D35]">
-      {/* Header */}
-      <header className="border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
+      {/* Header Navigation - Responsivo */}
+      <header className="sticky top-0 z-40 bg-[#0D1D35]/95 backdrop-blur-sm border-b border-white/10">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-3 sm:py-4">
+          <div className="flex justify-between items-center">
             <div className="flex items-center">
-              <Link href="/" className="text-2xl font-bold text-white hover:text-[#9DFAD7] transition-colors">
-          FinancIA
-        </Link>
+              <Link href="/" className="text-xl sm:text-2xl font-bold text-white hover:text-[#9DFAD7] transition-colors">
+                FinancIA
+              </Link>
             </div>
             
-            <div className="flex items-center space-x-6">
-              <span className="text-white/80 hidden md:block">
-                Hola, {user?.user_metadata?.name || user?.email}
-          </span>
-              <AddTransactionForm onTransactionAdded={handleTransactionAdded} />
-          <button
-            onClick={handleLogout}
-                className="text-white/70 hover:text-red-400 transition-colors"
-          >
-            Cerrar Sesión
-          </button>
-        </div>
+            <div className="flex items-center space-x-2 sm:space-x-4">
+              <div className="hidden sm:block text-white/80 text-sm">
+                ¡Hola, {user?.user_metadata?.full_name || 'Usuario'}!
+              </div>
+              <button
+                onClick={handleLogout}
+                className="bg-red-500/20 hover:bg-red-500/30 text-red-400 hover:text-red-300 px-3 sm:px-4 py-2 rounded-lg transition-colors text-sm sm:text-base"
+              >
+                <span className="hidden sm:inline">Cerrar Sesión</span>
+                <span className="sm:hidden">Salir</span>
+              </button>
+            </div>
           </div>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
-        {/* Métrica 1: Balance/Presupuesto principal - 40% del viewport */}
-        <div className="mb-8" style={{ minHeight: '40vh' }}>
-                        <BudgetMetric
-                totalBudget={totalBudget}
-                spentAmount={totalSpent}
-                totalIncome={totalIncome}
-                onBudgetUpdate={handleBudgetUpdate}
-                onOpenBudgetModal={() => setShowBudgetModal(true)}
-                isNewUser={isNewUser}
-              />
-          </div>
+      <main className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-6 lg:py-8">
+        {/* Métrica 1: Balance/Presupuesto principal - Responsivo */}
+        <div className="mb-6 sm:mb-8">
+          <BudgetMetric
+            totalBudget={totalBudget}
+            spentAmount={totalSpent}
+            totalIncome={totalIncome}
+            onBudgetUpdate={handleBudgetUpdate}
+            onOpenBudgetModal={() => setShowBudgetModal(true)}
+            isNewUser={isNewUser}
+          />
+        </div>
 
         {/* Resumen de Gastos - Solo si hay transacciones */}
         {!isNewUser && (
-          <div className="mb-8">
+          <div className="mb-6 sm:mb-8">
             <ExpenseSummary
               todayExpenses={todayExpenses}
               weekExpenses={weekExpenses}
               monthExpenses={monthExpenses}
               totalExpenses={totalSpent}
             />
-              </div>
+          </div>
         )}
 
         {/* Métricas 2 y 3: Grid responsivo - Solo si hay transacciones */}
         {!isNewUser && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-8">
-            {/* Métrica 2: Gastos por categoría - bottom-left */}
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 mb-6 sm:mb-8">
+            {/* Métrica 2: Gastos por categoría */}
             <div className="order-1">
               <CategoryChart
                 expensesByCategory={expensesByCategory}
@@ -205,7 +179,7 @@ export default function DashboardPage() {
               />
             </div>
 
-            {/* Métrica 3: Tendencia semanal - bottom-right */}
+            {/* Métrica 3: Tendencia semanal */}
             <div className="order-2">
               <WeeklyTrendChart
                 weeklyData={weeklyTrend}
@@ -216,54 +190,42 @@ export default function DashboardPage() {
         )}
 
         {/* Tabla de Presupuesto Visual */}
-        <div className="mb-8">
+        <div className="mb-6 sm:mb-8">
           <BudgetTable userId={user?.id} />
         </div>
 
         {/* WhatsApp Chat Button */}
-        <div className="mb-8">
+        <div className="mb-6 sm:mb-8">
           <WhatsAppChatButton />
         </div>
 
-        {/* Resumen de estadísticas generales - Solo si hay transacciones */}
-        {!isNewUser && (
-          <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 text-center border border-white/20">
-              <h4 className="text-white/70 text-sm font-medium">Total Ingresos</h4>
-              <p className="text-2xl font-bold text-green-400 mt-2">
-                {new Intl.NumberFormat('es-CO', {
-                  style: 'currency',
-                  currency: 'COP',
-                  minimumFractionDigits: 0,
-                }).format(totalIncome)}
-              </p>
-            </div>
-
-            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 text-center border border-white/20">
-              <h4 className="text-white/70 text-sm font-medium">Total Gastos</h4>
-              <p className="text-2xl font-bold text-red-400 mt-2">
-                {new Intl.NumberFormat('es-CO', {
-                  style: 'currency',
-                  currency: 'COP',
-                  minimumFractionDigits: 0,
-                }).format(totalSpent)}
-              </p>
-          </div>
-
-            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 text-center border border-white/20">
-              <h4 className="text-white/70 text-sm font-medium">Balance</h4>
-              <p className={`text-2xl font-bold mt-2 ${
-                totalIncome - totalSpent >= 0 ? 'text-green-400' : 'text-red-400'
-              }`}>
-                {new Intl.NumberFormat('es-CO', {
-                  style: 'currency',
-                  currency: 'COP',
-                  minimumFractionDigits: 0,
-                }).format(totalIncome - totalSpent)}
-              </p>
+        {/* Formulario para agregar transacciones - Posición fija en móvil */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+          <div className="lg:col-span-1">
+            <div className="sticky top-20 sm:top-24">
+              <AddTransactionForm 
+                onTransactionAdded={refetchTransactions}
+              />
             </div>
           </div>
-        )}
+          
+          {/* Espacio para futuras métricas o información adicional */}
+          <div className="lg:col-span-2">
+            <div className="bg-gradient-to-br from-white/5 to-white/2 backdrop-blur-sm rounded-2xl p-4 sm:p-6 border border-white/10">
+              <div className="text-center py-8 sm:py-12">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 bg-[#9DFAD7]/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-2xl sm:text-3xl">📊</span>
+                </div>
+                <h3 className="text-lg sm:text-xl font-semibold text-white mb-2">
+                  ¡Más funciones próximamente!
+                </h3>
+                <p className="text-white/70 text-sm sm:text-base max-w-md mx-auto">
+                  Estamos trabajando en nuevas métricas y análisis avanzados para ayudarte a tomar mejores decisiones financieras.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
       </main>
 
       {/* Modal de configuración de presupuesto */}
@@ -273,6 +235,6 @@ export default function DashboardPage() {
         onClose={() => setShowBudgetModal(false)}
         onSave={handleBudgetSetup}
       />
-        </div>
+    </div>
   )
 } 

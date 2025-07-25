@@ -1,6 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import { Calendar, Clock, TrendingUp, DollarSign } from 'lucide-react'
 
 interface ExpenseSummaryProps {
   todayExpenses: number
@@ -21,80 +22,93 @@ export const ExpenseSummary = ({
       currency: 'COP',
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
+      notation: 'compact'
     }).format(amount)
   }
 
-  const summaryCards = [
+  const formatCurrencyFull = (amount: number) => {
+    return new Intl.NumberFormat('es-CO', {
+      style: 'currency',
+      currency: 'COP',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    }).format(amount)
+  }
+
+  const expenseItems = [
     {
-      title: 'Hoy',
+      icon: Clock,
+      label: 'Hoy',
       amount: todayExpenses,
-      color: 'from-green-500 to-green-600',
-      bgColor: 'bg-green-500/20',
-      borderColor: 'border-green-500/30'
+      color: 'text-blue-400',
+      bgColor: 'bg-blue-500/10',
+      borderColor: 'border-blue-500/20'
     },
     {
-      title: 'Esta Semana',
+      icon: Calendar,
+      label: 'Esta Semana',
       amount: weekExpenses,
-      color: 'from-blue-500 to-blue-600',
-      bgColor: 'bg-blue-500/20',
-      borderColor: 'border-blue-500/30'
+      color: 'text-green-400',
+      bgColor: 'bg-green-500/10',
+      borderColor: 'border-green-500/20'
     },
     {
-      title: 'Este Mes',
+      icon: TrendingUp,
+      label: 'Este Mes',
       amount: monthExpenses,
-      color: 'from-purple-500 to-purple-600',
-      bgColor: 'bg-purple-500/20',
-      borderColor: 'border-purple-500/30'
+      color: 'text-purple-400',
+      bgColor: 'bg-purple-500/10',
+      borderColor: 'border-purple-500/20'
     },
     {
-      title: 'Total',
+      icon: DollarSign,
+      label: 'Total',
       amount: totalExpenses,
-      color: 'from-gray-500 to-gray-600',
-      bgColor: 'bg-gray-500/20',
-      borderColor: 'border-gray-500/30'
+      color: 'text-red-400',
+      bgColor: 'bg-red-500/10',
+      borderColor: 'border-red-500/20'
     }
   ]
 
   return (
-    <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-      <div className="text-center mb-6">
-        <h3 className="text-xl font-bold text-white mb-2">Resumen de Gastos</h3>
-        <p className="text-white/70 text-sm">Tus gastos organizados por período</p>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {summaryCards.map((card, index) => (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-lg rounded-2xl p-4 sm:p-6 border border-white/20 shadow-2xl"
+    >
+      <h3 className="text-lg sm:text-xl font-bold text-white mb-4 sm:mb-6">
+        Resumen de Gastos
+      </h3>
+      
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        {expenseItems.map((item, index) => (
           <motion.div
-            key={card.title}
+            key={item.label}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: index * 0.1 }}
-            className={`${card.bgColor} ${card.borderColor} border backdrop-blur-sm rounded-xl p-4 hover:scale-105 transition-all duration-300 cursor-pointer group`}
+            transition={{ delay: index * 0.1 }}
+            className={`${item.bgColor} ${item.borderColor} border rounded-xl p-3 sm:p-4 text-center hover:scale-105 transition-transform duration-200`}
           >
-            <div className="text-center">
-              <h4 className="text-white/80 text-sm font-medium mb-2 group-hover:text-white transition-colors">
-                {card.title}
-              </h4>
-              
-              <div className={`text-2xl md:text-3xl font-bold bg-gradient-to-r ${card.color} bg-clip-text text-transparent mb-1`}>
-                {formatCurrency(card.amount).replace('COP', '').trim()}
-              </div>
-              
-              <p className="text-white/60 text-xs font-medium">COP</p>
-            </div>
-
-            {/* Efecto hover sutil */}
-            <div className={`absolute inset-0 bg-gradient-to-r ${card.color} opacity-0 group-hover:opacity-5 transition-opacity duration-300 rounded-xl pointer-events-none`} />
+            <item.icon className={`h-6 w-6 sm:h-8 sm:w-8 ${item.color} mx-auto mb-2 sm:mb-3`} />
+            <p className="text-white/70 text-xs sm:text-sm mb-1 sm:mb-2 font-medium">
+              {item.label}
+            </p>
+            <p 
+              className={`text-sm sm:text-lg lg:text-xl font-bold ${item.color} break-words`}
+              title={formatCurrencyFull(item.amount)}
+            >
+              {formatCurrency(item.amount)}
+            </p>
           </motion.div>
         ))}
       </div>
-
-      {/* Indicador de actualización */}
-      <div className="mt-4 text-center">
-        <p className="text-white/50 text-xs">
-          📊 Actualizado en tiempo real desde Supabase
+      
+      {/* Mensaje informativo */}
+      <div className="mt-4 sm:mt-6 text-center">
+        <p className="text-white/60 text-xs sm:text-sm">
+          💡 Mantente al día con tus gastos para un mejor control financiero
         </p>
       </div>
-    </div>
+    </motion.div>
   )
 } 
