@@ -58,55 +58,75 @@ export async function logIn(formData: FormData) {
 }
 
 export async function signUp(formData: FormData) {
+  // ===== LOGS DE DEBUG INICIALES =====
+  console.log('🚀 SERVER - Función signUp iniciada');
+  console.log('📥 SERVER - FormData recibido:', Array.from(formData.entries()));
+  
   const name = formData.get("name") as string;
   const email = formData.get("email") as string;
   const phone = formData.get("phone") as string;
   const password = formData.get("password") as string;
   const repeatPassword = formData.get("repeatPassword") as string;
 
-  console.log('DEBUG - Datos recibidos:', { name, email, phone, password: '***' });
+  console.log('🔍 SERVER - Datos extraídos:', { 
+    name: name || 'NULL', 
+    email: email || 'NULL', 
+    phone: phone || 'NULL',
+    password: password ? '***' : 'NULL',
+    repeatPassword: repeatPassword ? '***' : 'NULL'
+  });
 
   // Validaciones básicas
   if (!name || !email || !phone || !password || !repeatPassword) {
+    console.log('❌ SERVER - Validación falló: campos faltantes');
     return {
       error: "Por favor completa todos los campos"
     };
   }
 
   if (name.trim().length < 2) {
+    console.log('❌ SERVER - Validación falló: nombre muy corto');
     return {
       error: "El nombre debe tener al menos 2 caracteres"
     };
   }
 
   if (!email.includes("@")) {
+    console.log('❌ SERVER - Validación falló: email inválido');
     return {
       error: "Por favor ingresa un email válido"
     };
   }
 
   if (!phone || phone.length < 10) {
+    console.log('❌ SERVER - Validación falló: teléfono inválido', { phone, length: phone?.length });
     return {
       error: "Por favor ingresa un número de teléfono válido"
     };
   }
 
   if (password.length < 6) {
+    console.log('❌ SERVER - Validación falló: contraseña muy corta');
     return {
       error: "La contraseña debe tener al menos 6 caracteres"
     };
   }
 
   if (password !== repeatPassword) {
+    console.log('❌ SERVER - Validación falló: contraseñas no coinciden');
     return {
       error: "Las contraseñas no coinciden"
     };
   }
 
+  console.log('✅ SERVER - Todas las validaciones pasaron');
+
   const supabase = await createSupabaseClient();
+  console.log('🔗 SERVER - Cliente Supabase creado');
 
   try {
     // 1. Crear usuario en auth.users - LÓGICA DEL INSIGHTS
+    console.log('📝 SERVER - Iniciando auth.signUp...');
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -118,7 +138,7 @@ export async function signUp(formData: FormData) {
       }
     });
 
-    console.log('DEBUG - Resultado auth.signUp:', { 
+    console.log('📊 SERVER - Resultado auth.signUp:', { 
       userId: data.user?.id, 
       error: error?.message 
     });
@@ -126,7 +146,8 @@ export async function signUp(formData: FormData) {
     // 2. Si el registro fue exitoso, usar UPSERT en lugar de INSERT - LÓGICA DEL INSIGHTS
     if (!error && data.user && (name || phone)) {
       try {
-        console.log('DEBUG - Intentando UPSERT en tabla usuarios:', {
+        console.log('💾 SERVER - Iniciando UPSERT en tabla usuarios...');
+        console.log('📋 SERVER - Datos para UPSERT:', {
           id: data.user.id,
           nombre: name.trim(),
           gmail: email.trim(),
@@ -144,23 +165,31 @@ export async function signUp(formData: FormData) {
             onConflict: 'id'
           });
 
-        console.log('DEBUG - Resultado UPSERT usuarios:', { 
+        console.log('📈 SERVER - Resultado UPSERT usuarios:', { 
           upsertData, 
           userError: userError?.message 
         });
 
         if (userError) {
-          console.error('Error al insertar datos del usuario:', userError);
+          console.error('🚨 SERVER - Error al insertar datos del usuario:', userError);
           // No fallar el registro, pero loggearlo
+        } else {
+          console.log('🎉 SERVER - UPSERT exitoso en tabla usuarios');
         }
       } catch (insertError) {
-        console.error('Error al insertar en usuarios:', insertError);
+        console.error('💥 SERVER - Error en catch de inserción:', insertError);
         // No fallar el registro, pero loggearlo
       }
+    } else {
+      console.log('⚠️ SERVER - No se ejecutó UPSERT:', {
+        hasError: !!error,
+        hasUser: !!data.user,
+        hasNameOrPhone: !!(name || phone)
+      });
     }
 
     if (error) {
-      console.error('Supabase signUp error:', error);
+      console.error('🔥 SERVER - Error en auth.signUp:', error);
       
       if (error.message.includes("User already registered")) {
         return { error: "Ya existe una cuenta con este email" };
@@ -182,7 +211,7 @@ export async function signUp(formData: FormData) {
       }
       
       // Log del error completo para debugging
-      console.error('Error completo de Supabase:', {
+      console.error('📋 SERVER - Error completo de Supabase:', {
         message: error.message,
         status: error.status
       });
@@ -190,11 +219,12 @@ export async function signUp(formData: FormData) {
       return { error: `Error al crear la cuenta: ${error.message}` };
     }
 
+    console.log('🏆 SERVER - Registro completado exitosamente');
     return {
       success: "Cuenta creada exitosamente. Revisa tu email para confirmarla"
     };
   } catch (error) {
-    console.error('Catch error in signUp:', error);
+    console.error('💣 SERVER - Error en catch principal:', error);
     return {
       error: "Error del servidor. Verifica tu conexión e intenta más tarde"
     };
