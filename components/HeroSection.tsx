@@ -29,12 +29,15 @@ const HeroSection = () => {
             Con tan solo un mensaje, nuestro asistente te ayuda a transformar tu dinero. 
             Registra, visualiza y recibe consejos inteligentes al instante.
           </p>
-          <button 
-            className="bg-[#9DFAD7] text-[#0D1D35] px-8 py-4 rounded-lg font-medium 
+          <a 
+            href="https://wa.me/573223796302?text=¡Hola%20FinancIA!%20Quiero%20conocer%20más%20sobre%20el%20asistente%20financiero%20🚀"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block bg-[#9DFAD7] text-[#0D1D35] px-8 py-4 rounded-lg font-medium 
                      hover:bg-opacity-90 transition-all duration-300 shadow-lg text-lg"
           >
             Chatea ya con FinancIA
-          </button>
+          </a>
         </div>
 
         {/* Columna derecha - Chat Mockup */}

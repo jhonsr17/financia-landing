@@ -172,20 +172,31 @@ export const WaitlistForm = () => {
           </div>
         </div>
         
-        <button
-          type="submit"
-          disabled={isLoading}
-          className="w-full bg-gradient-to-r from-[#9DFAD7] to-[#D4FFB5] text-[#0D1D35] font-semibold py-3 px-6 rounded-xl hover:opacity-90 transition-all duration-300 disabled:opacity-50 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-[#9DFAD7]/20"
-        >
-          {isLoading ? (
-            <div className="flex items-center justify-center">
-              <div className="w-5 h-5 border-2 border-[#0D1D35] border-t-transparent rounded-full animate-spin mr-2"></div>
-              Registrando...
-            </div>
-          ) : (
-            'Chatea ya con FinancIA'
-          )}
-        </button>
+        <div className="space-y-3">
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="w-full bg-gradient-to-r from-[#9DFAD7] to-[#D4FFB5] text-[#0D1D35] font-semibold py-3 px-6 rounded-xl hover:opacity-90 transition-all duration-300 disabled:opacity-50 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-[#9DFAD7]/20"
+          >
+            {isLoading ? (
+              <div className="flex items-center justify-center">
+                <div className="w-5 h-5 border-2 border-[#0D1D35] border-t-transparent rounded-full animate-spin mr-2"></div>
+                Registrando...
+              </div>
+            ) : (
+              'Registrarme en la lista'
+            )}
+          </button>
+          
+          <a
+            href="https://wa.me/573223796302?text=¡Hola%20FinancIA!%20Quiero%20chatear%20contigo%20ahora%20🚀"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full bg-white/10 border border-[#9DFAD7]/50 text-[#9DFAD7] font-semibold py-3 px-6 rounded-xl hover:bg-white/20 transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg block text-center"
+          >
+            Chatea ya con FinancIA
+          </a>
+        </div>
 
         {message && (
           <div 

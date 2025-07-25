@@ -97,7 +97,9 @@ const PricingSection = () => {
             {/* CTA Button */}
             <div className="p-8 pt-0">
               <motion.a
-                href="#waitlist"
+                href="https://wa.me/573223796302?text=¡Hola%20FinancIA!%20Me%20interesa%20el%20Plan%20Lanzamiento%20🚀"
+                target="_blank"
+                rel="noopener noreferrer"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 className="w-full bg-gradient-to-r from-[#9DFAD7] to-[#D4FFB5] hover:from-[#9DFAD7]/90 hover:to-[#D4FFB5]/90 text-[#0D1D35] font-semibold py-4 px-6 rounded-xl transition duration-300 shadow-lg hover:shadow-xl block text-center"

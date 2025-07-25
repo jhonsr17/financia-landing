@@ -34,7 +34,9 @@ export default function Home() {
                 Registra, visualiza y recibe consejos inteligentes al instante.
               </p>
               <a
-                href='#waitlist'
+                href='https://wa.me/573223796302?text=¡Hola%20FinancIA!%20Quiero%20conocer%20más%20sobre%20el%20asistente%20financiero%20🚀'
+                target='_blank'
+                rel='noopener noreferrer'
                 className='inline-block bg-gradient-to-r from-[#9DFAD7] to-[#D4FFB5] text-[#0D1D35] font-semibold py-3 px-6 md:px-8 rounded-xl hover:opacity-90 transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-[#9DFAD7]/20 mt-4 md:mt-6 text-sm md:text-base'
               >
                 Chatea ya con FinancIA
