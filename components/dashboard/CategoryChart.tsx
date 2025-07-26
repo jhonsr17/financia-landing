@@ -1,12 +1,13 @@
 'use client'
 
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts'
 import { useState } from 'react'
+import { TrendingUp, DollarSign } from 'lucide-react'
 
 interface CategoryData {
   name: string
   value: number
-  color: string
+  percentage: number
+  intensity: number // 0-1 para el color del mapa de calor
 }
 
 interface CategoryChartProps {
@@ -14,43 +15,21 @@ interface CategoryChartProps {
   onCategoryClick?: (category: string) => void
 }
 
-// Paleta de colores específica
-const COLORS = [
-  '#8B5CF6', // Púrpura
-  '#06B6D4', // Cyan
-  '#10B981', // Esmeralda
-  '#F59E0B', // Ámbar
-  '#EF4444', // Rojo
-  '#6B7280', // Gris para "Otros"
-]
-
 export const CategoryChart = ({ expensesByCategory, onCategoryClick }: CategoryChartProps) => {
   const [hoveredCategory, setHoveredCategory] = useState<string | null>(null)
   
-  // Procesar datos para mostrar máximo 5 categorías + "Otros"
-  const sortedCategories = Object.entries(expensesByCategory)
-    .sort(([, a], [, b]) => b - a)
-    .map(([name, value]) => ({ name, value }))
-
-  const topCategories = sortedCategories.slice(0, 5)
-  const otherCategories = sortedCategories.slice(5)
+  // Procesar datos para el mapa de calor
+  const totalAmount = Object.values(expensesByCategory).reduce((sum, value) => sum + value, 0)
   
-  const otherTotal = otherCategories.reduce((sum, cat) => sum + cat.value, 0)
-  
-  const chartData: CategoryData[] = [
-    ...topCategories.map((cat, index) => ({
-      name: cat.name,
-      value: cat.value,
-      color: COLORS[index],
-    })),
-    ...(otherTotal > 0 ? [{
-      name: 'Otros',
-      value: otherTotal,
-      color: COLORS[5],
-    }] : [])
-  ]
-
-  const totalAmount = chartData.reduce((sum, item) => sum + item.value, 0)
+  const categoryData: CategoryData[] = Object.entries(expensesByCategory)
+    .map(([name, value]) => ({
+      name,
+      value,
+      percentage: (value / totalAmount) * 100,
+      intensity: value / Math.max(...Object.values(expensesByCategory)) // Normalizar 0-1
+    }))
+    .sort((a, b) => b.value - a.value)
+    .slice(0, 8) // Mostrar máximo 8 categorías
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('es-CO', {
@@ -61,47 +40,31 @@ export const CategoryChart = ({ expensesByCategory, onCategoryClick }: CategoryC
     }).format(amount)
   }
 
-  const CustomTooltip = ({ active, payload }: any) => {
-    if (active && payload && payload.length) {
-      const data = payload[0]
-      const percentage = ((data.value / totalAmount) * 100).toFixed(1)
-      
-      return (
-        <div className="bg-[#0D1D35] border border-white/20 rounded-lg p-3 shadow-lg">
-          <p className="font-medium text-white">{data.name}</p>
-          <p className="text-[#9DFAD7]">{formatCurrency(data.value)}</p>
-          <p className="text-white/70 text-sm">{percentage}% del total</p>
-        </div>
-      )
-    }
-    return null
+  const getHeatmapColor = (intensity: number) => {
+    // Gradiente de frío a caliente basado en la intensidad
+    const colors = [
+      'rgba(157, 250, 215, 0.1)', // Muy bajo - verde claro transparente
+      'rgba(157, 250, 215, 0.3)', // Bajo - verde claro
+      'rgba(34, 197, 94, 0.4)',   // Medio-bajo - verde
+      'rgba(245, 158, 11, 0.5)',  // Medio - amarillo
+      'rgba(239, 68, 68, 0.6)',   // Medio-alto - naranja
+      'rgba(239, 68, 68, 0.8)',   // Alto - rojo
+      'rgba(220, 38, 127, 0.9)',  // Muy alto - rosa intenso
+    ]
+    
+    const index = Math.floor(intensity * (colors.length - 1))
+    return colors[index] || colors[0]
   }
 
-  const CustomLegend = ({ payload }: any) => {
-    return (
-      <div className="flex flex-wrap justify-center gap-2 mt-4">
-        {payload.map((entry: any, index: number) => (
-          <div
-            key={index}
-            className={`flex items-center gap-2 px-2 py-1 rounded-md cursor-pointer transition-all duration-200 ${
-              hoveredCategory === entry.value ? 'bg-white/10' : 'hover:bg-white/5'
-            }`}
-            onMouseEnter={() => setHoveredCategory(entry.value)}
-            onMouseLeave={() => setHoveredCategory(null)}
-            onClick={() => onCategoryClick?.(entry.value)}
-          >
-            <div 
-              className="w-3 h-3 rounded-full" 
-              style={{ backgroundColor: entry.color }}
-            />
-            <span className="text-sm text-white">{entry.value}</span>
-          </div>
-        ))}
-      </div>
-    )
+  const getBorderColor = (intensity: number) => {
+    if (intensity > 0.8) return 'rgba(220, 38, 127, 0.5)'
+    if (intensity > 0.6) return 'rgba(239, 68, 68, 0.4)'
+    if (intensity > 0.4) return 'rgba(245, 158, 11, 0.3)'
+    if (intensity > 0.2) return 'rgba(34, 197, 94, 0.3)'
+    return 'rgba(157, 250, 215, 0.2)'
   }
 
-  if (chartData.length === 0) {
+  if (categoryData.length === 0) {
     return (
       <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 h-[400px] flex items-center justify-center border border-white/20">
         <div className="text-center">
@@ -115,46 +78,95 @@ export const CategoryChart = ({ expensesByCategory, onCategoryClick }: CategoryC
   }
 
   return (
-    <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20">
-      <div className="text-center mb-4">
-        <h3 className="text-lg font-semibold text-white">Gastos por categoría</h3>
-        <p className="text-sm text-white/70">
+    <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 sm:p-6 border border-white/20">
+      <div className="text-center mb-4 sm:mb-6">
+        <h3 className="text-lg sm:text-xl font-semibold text-white">Mapa de Calor por Categoría</h3>
+        <p className="text-xs sm:text-sm text-white/70">
           Total: {formatCurrency(totalAmount)}
         </p>
       </div>
       
-      <div className="h-[300px]">
-        <ResponsiveContainer width="100%" height="100%">
-          <PieChart>
-            <Pie
-              data={chartData}
-              cx="50%"
-              cy="50%"
-              innerRadius={60}
-              outerRadius={100}
-              paddingAngle={2}
-              dataKey="value"
-              animationBegin={0}
-              animationDuration={800}
-            >
-              {chartData.map((entry, index) => (
-                <Cell 
-                  key={`cell-${index}`} 
-                  fill={entry.color}
-                  stroke={hoveredCategory === entry.name ? '#ffffff' : 'transparent'}
-                  strokeWidth={hoveredCategory === entry.name ? 2 : 0}
-                  style={{
-                    filter: hoveredCategory && hoveredCategory !== entry.name ? 'opacity(0.6)' : 'none',
-                    cursor: 'pointer'
-                  }}
-                  onClick={() => onCategoryClick?.(entry.name)}
-                />
-              ))}
-            </Pie>
-            <Tooltip content={<CustomTooltip />} />
-            <Legend content={<CustomLegend />} />
-          </PieChart>
-        </ResponsiveContainer>
+      {/* Mapa de calor - Grid responsivo */}
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3">
+        {categoryData.map((category, index) => (
+          <div
+            key={category.name}
+            className={`
+              relative overflow-hidden rounded-xl p-3 sm:p-4 cursor-pointer transition-all duration-300 transform
+              ${hoveredCategory === category.name ? 'scale-105 shadow-2xl' : 'hover:scale-102'}
+              ${hoveredCategory && hoveredCategory !== category.name ? 'opacity-60' : ''}
+            `}
+            style={{
+              backgroundColor: getHeatmapColor(category.intensity),
+              borderColor: getBorderColor(category.intensity),
+              borderWidth: '1px',
+              borderStyle: 'solid'
+            }}
+            onMouseEnter={() => setHoveredCategory(category.name)}
+            onMouseLeave={() => setHoveredCategory(null)}
+            onClick={() => onCategoryClick?.(category.name)}
+          >
+            {/* Indicador de intensidad */}
+            <div className="absolute top-2 right-2">
+              <div className={`
+                w-2 h-2 rounded-full
+                ${category.intensity > 0.8 ? 'bg-red-500' : 
+                  category.intensity > 0.6 ? 'bg-orange-500' :
+                  category.intensity > 0.4 ? 'bg-yellow-500' :
+                  category.intensity > 0.2 ? 'bg-green-500' : 'bg-blue-400'}
+              `} />
+            </div>
+
+            {/* Icono */}
+            <div className="flex items-center justify-center mb-2 sm:mb-3">
+              <div className={`
+                w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center
+                ${category.intensity > 0.6 ? 'bg-white/20' : 'bg-white/10'}
+              `}>
+                {index === 0 ? <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-white" /> : 
+                 <DollarSign className="h-4 w-4 sm:h-5 sm:w-5 text-white" />}
+              </div>
+            </div>
+
+            {/* Información de categoría */}
+            <div className="text-center">
+              <h4 className="text-xs sm:text-sm font-semibold text-white mb-1 truncate">
+                {category.name}
+              </h4>
+              <p className="text-xs sm:text-sm text-white/90 font-bold">
+                {formatCurrency(category.value)}
+              </p>
+              <p className="text-xs text-white/70">
+                {category.percentage.toFixed(1)}%
+              </p>
+            </div>
+
+            {/* Barra de intensidad en la parte inferior */}
+            <div className="absolute bottom-0 left-0 w-full h-1 bg-white/10">
+              <div 
+                className="h-full bg-white/50 transition-all duration-300"
+                style={{ width: `${category.intensity * 100}%` }}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Leyenda del mapa de calor */}
+      <div className="mt-4 sm:mt-6 flex items-center justify-center">
+        <div className="flex items-center gap-2 text-xs text-white/70">
+          <span>Menor gasto</span>
+          <div className="flex gap-1">
+            {[0.1, 0.3, 0.5, 0.7, 0.9].map((intensity, i) => (
+              <div
+                key={i}
+                className="w-4 h-2 rounded-sm"
+                style={{ backgroundColor: getHeatmapColor(intensity) }}
+              />
+            ))}
+          </div>
+          <span>Mayor gasto</span>
+        </div>
       </div>
     </div>
   )
