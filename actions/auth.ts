@@ -48,7 +48,7 @@ export async function logIn(formData: FormData) {
       return { error: "Error al iniciar sesión. Verifica tus datos" };
     }
 
-    // Solo redirigir si no hay error
+    // 🎯 Redirigir al dashboard después del login exitoso
     redirect("/dashboard");
   } catch (error) {
     return {

@@ -128,8 +128,8 @@ export default function DashboardPage() {
             </div>
             
             <div className="flex items-center space-x-2 sm:space-x-4">
-              <div className="hidden sm:block text-white/80 text-sm">
-                ¡Hola, {user?.user_metadata?.full_name || 'Usuario'}!
+              <div className="text-white/80 text-xs sm:text-sm">
+                ¡Hola, {user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Usuario'}!
               </div>
               <button
                 onClick={handleLogout}
