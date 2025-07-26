@@ -98,7 +98,7 @@ export const useTransactionsUnified = () => {
     if (user) {
       fetchTransactions()
       
-      // Suscribirse a cambios en tiempo real
+      // Suscribirse a cambios en tiempo real - CORREGIDO para usar usuario_id
       const subscription = supabase
         .channel('transacciones_unified')
         .on(
@@ -107,10 +107,30 @@ export const useTransactionsUnified = () => {
             event: '*',
             schema: 'public',
             table: 'transacciones',
-            filter: `user_id=eq.${user.id}`
+            filter: `usuario_id=eq.${user.id}` // 🎯 CORREGIDO: usar usuario_id en lugar de user_id
           },
-          () => {
-            console.log('Cambio detectado en transacciones, recargando...')
+          (payload) => {
+            console.log('🔄 Cambio detectado en transacciones:', payload)
+            console.log('🔃 Recargando datos de transacciones...')
+            fetchTransactions()
+          }
+        )
+        .subscribe()
+
+      // También intentar con estructura alternativa si la primera no funciona
+      const subscriptionAlt = supabase
+        .channel('transacciones_alt')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'transacciones',
+            filter: `user_id=eq.${user.id}` // Fallback para user_id
+          },
+          (payload) => {
+            console.log('🔄 Cambio detectado en transacciones (alt):', payload)
+            console.log('🔃 Recargando datos de transacciones...')
             fetchTransactions()
           }
         )
@@ -118,6 +138,7 @@ export const useTransactionsUnified = () => {
 
       return () => {
         subscription.unsubscribe()
+        subscriptionAlt.unsubscribe()
       }
     }
   }, [user])
@@ -175,28 +196,46 @@ export const useTransactionsUnified = () => {
 
   // Tendencia semanal (últimas 4 semanas)
   const getWeeklyTrend = () => {
+    console.log('🔄 Calculando tendencia semanal con', transactions.length, 'transacciones')
+    
     const weeks = []
     const today = new Date()
     
     for (let i = 3; i >= 0; i--) {
-      const weekStart = new Date(today.getTime() - (i * 7 * 24 * 60 * 60 * 1000))
-      const weekEnd = new Date(weekStart.getTime() + (6 * 24 * 60 * 60 * 1000))
+      // Calcular el inicio de la semana (lunes)
+      const currentWeekStart = new Date(today)
+      currentWeekStart.setDate(today.getDate() - today.getDay() + 1) // Ir al lunes de esta semana
       
-      const weekTotal = transactions
-        .filter(t => {
-          if (!t.created_at || t.tipo !== 'gasto') return false
-          const transactionDate = new Date(t.created_at)
-          return transactionDate >= weekStart && transactionDate <= weekEnd
-        })
-        .reduce((sum, t) => sum + (t.monto || 0), 0)
+      const weekStart = new Date(currentWeekStart.getTime() - (i * 7 * 24 * 60 * 60 * 1000))
+      const weekEnd = new Date(weekStart.getTime() + (6 * 24 * 60 * 60 * 1000))
+      weekEnd.setHours(23, 59, 59, 999) // Final del domingo
+      
+      const weekTransactions = transactions.filter(t => {
+        if (!t.created_at || t.tipo !== 'gasto') return false
+        const transactionDate = new Date(t.created_at)
+        return transactionDate >= weekStart && transactionDate <= weekEnd
+      })
+      
+      const weekTotal = weekTransactions.reduce((sum, t) => sum + (t.monto || 0), 0)
+      
+      const weekLabel = i === 0 ? 'Esta semana' : `Hace ${i} semana${i > 1 ? 's' : ''}`
+      
+      console.log(`📊 Semana ${4 - i}:`, {
+        label: weekLabel,
+        inicio: weekStart.toLocaleDateString(),
+        fin: weekEnd.toLocaleDateString(),
+        transacciones: weekTransactions.length,
+        total: weekTotal
+      })
       
       weeks.push({
         amount: weekTotal,
-        date: weekStart.toISOString().split('T')[0],
-        week: `Semana ${4 - i}`
+        date: weekStart.toLocaleDateString('es-CO'),
+        week: weekLabel
       })
     }
     
+    console.log('📈 Tendencia semanal completa:', weeks)
     return weeks
   }
 
