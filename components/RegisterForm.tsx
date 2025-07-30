@@ -29,7 +29,7 @@ export const RegisterForm = () => {
     console.log('📱 FORM SUBMIT - Teléfono:', JSON.stringify({ 
       countryCode, 
       phoneNumber, 
-      fullPhone 
+      fullPhone
     }))
     
     const form = e.currentTarget // Guardar referencia al formulario
@@ -38,7 +38,7 @@ export const RegisterForm = () => {
     const requestData = {
       name: formData.get('name') as string,
       email: formData.get('email') as string,
-      phone: fullPhone,
+      phone: fullPhone, // El trigger quitará el '+' en la base de datos
       password: formData.get('password') as string,
       repeatPassword: formData.get('repeatPassword') as string
     }
