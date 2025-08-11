@@ -1,4 +1,3 @@
-import { FloatingChat } from '@/components/FloatingChat'
 import ChatCarousel from '@/components/ChatCarousel'
 import StatsSection from '@/components/StatsSection'
 import FeaturesGrid from '@/components/FeaturesGrid'
@@ -20,28 +19,22 @@ export default function Home() {
       </nav>
 
       {/* Hero Section */}
-      <section id='inicio' className='container mx-auto px-4 py-8 md:py-12'>
-        <div className='grid md:grid-cols-2 gap-8 md:gap-12'>
-          <div className='space-y-4 md:space-y-6 md:h-[600px] flex flex-col justify-center'>
-            <div>
-              <h2 className='text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight'>
-                Tu asistente financiero personal,{" "}
-                <span className='text-[#9DFAD7]'>ahora en tu WhatsApp</span>
-              </h2>
-              <p className='text-base md:text-lg text-white/80 mt-4 md:mt-6 leading-relaxed'>
-                Con tan solo un mensaje, nuestro asistente te ayuda a transformar tu dinero.
-                Registra, visualiza y recibe consejos inteligentes al instante.
-              </p>
-              <a
-                href='/register'
-                className='inline-block bg-gradient-to-r from-[#9DFAD7] to-[#D4FFB5] text-[#0D1D35] font-semibold py-3 px-6 md:px-8 rounded-xl hover:opacity-90 transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-[#9DFAD7]/20 mt-4 md:mt-6 text-sm md:text-base'
-              >
-                Chatea ya con FinancIA
-              </a>
-            </div>
-          </div>
-          <div className='relative md:h-[600px] flex items-center justify-center md:justify-start'>
-            <FloatingChat />
+      <section id='inicio' className='container mx-auto px-4 py-12 md:py-20'>
+        <div className='relative overflow-hidden rounded-2xl md:rounded-3xl p-8 md:p-14 bg-gradient-to-br from-[#D4FFB5] via-[#9DFAD7]/70 to-[#D4FFB5]'>
+          <div className='max-w-3xl'>
+            <h2 className='text-3xl md:text-5xl lg:text-6xl font-bold text-white leading-tight drop-shadow-md'>
+              Tu asistente financiero personal,{" "}
+              <span className='text-white'>ahora en tu WhatsApp</span>
+            </h2>
+            <p className='text-base md:text-xl text-white/90 mt-4 md:mt-6 leading-relaxed'>
+              Organiza tus finanzas con un simple mensaje en WhatsApp.
+            </p>
+            <a
+              href='/register'
+              className='inline-block bg-gradient-to-r from-[#9DFAD7] to-[#D4FFB5] text-[#0D1D35] font-semibold py-3 px-6 md:px-8 rounded-xl hover:opacity-90 transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-[#9DFAD7]/30 mt-6 text-sm md:text-base'
+            >
+              Chatea ya con FinancIA
+            </a>
           </div>
         </div>
       </section>
