@@ -3,6 +3,9 @@ import StatsSection from '@/components/StatsSection'
 import FeaturesGrid from '@/components/FeaturesGrid'
 import PricingSection from '@/components/PricingSection'
 import { AuthNavigation } from '@/components/AuthNavigation'
+import { WhatsAppChatSimulation } from '@/components/WhatsAppChatSimulation'
+import { CommunityTestimonial } from '@/components/CommunityTestimonial'
+import { WhatsAppCTAButton } from '@/components/WhatsAppCTAButton'
 
 
 export default function Home() {
@@ -19,20 +22,32 @@ export default function Home() {
       </nav>
 
       {/* Hero Section */}
-      <section id='inicio' className='container mx-auto px-4 py-16 md:py-24'>
-        <div className='text-center max-w-4xl mx-auto'>
-          <h2 className='text-4xl md:text-6xl font-bold text-[#0D1D35] leading-tight'>
-            Tu asistente financiero personal, <span className='text-[#0D1D35]'>ahora en tu WhatsApp</span>
-          </h2>
-          <p className='text-base md:text-xl text-[#0D1D35]/80 mt-5 md:mt-7 leading-relaxed'>
-            Organiza tus finanzas con un simple mensaje en WhatsApp.
-          </p>
-          <a
-            href='/register'
-            className='inline-block bg-gradient-to-r from-[#9DFAD7] to-[#D4FFB5] text-[#0D1D35] font-semibold py-3 px-8 rounded-xl hover:opacity-90 transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-[#9DFAD7]/30 mt-8 text-base md:text-lg'
-          >
-            Chatea ya con FinancIA
-          </a>
+      <section id='inicio' className='min-h-screen flex items-center justify-center px-4 py-8'>
+        <div className='text-center max-w-6xl mx-auto space-y-8'>
+          {/* Header Title */}
+          <div className='space-y-4'>
+            <h1 className='text-3xl md:text-5xl lg:text-6xl font-bold text-[#0D1D35] leading-tight'>
+              Tu asistente financiero personal, <span className='text-[#0D1D35]'>ahora en tu WhatsApp</span>
+            </h1>
+            <p className='text-lg md:text-xl text-[#0D1D35]/80 leading-relaxed max-w-3xl mx-auto'>
+              Organiza tus finanzas con un simple mensaje en WhatsApp.
+            </p>
+          </div>
+
+          {/* WhatsApp Chat Simulation */}
+          <div className='flex justify-center py-8'>
+            <WhatsAppChatSimulation />
+          </div>
+
+          {/* Community Testimonial */}
+          <div className='py-6'>
+            <CommunityTestimonial />
+          </div>
+
+          {/* CTA Button */}
+          <div className='pt-4'>
+            <WhatsAppCTAButton text="Probar Gratis Ahora" href="/register" />
+          </div>
         </div>
       </section>
 
