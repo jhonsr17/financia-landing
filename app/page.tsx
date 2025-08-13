@@ -3,8 +3,8 @@ import StatsSection from '@/components/StatsSection'
 import FeaturesGrid from '@/components/FeaturesGrid'
 import PricingSection from '@/components/PricingSection'
 import { AuthNavigation } from '@/components/AuthNavigation'
-import { WhatsAppChatSimulation } from '@/components/WhatsAppChatSimulation'
-import { CommunityTestimonial } from '@/components/CommunityTestimonial'
+import { FloatingUserMessages } from '@/components/FloatingUserMessages'
+import { CommunityStats } from '@/components/CommunityStats'
 import { WhatsAppCTAButton } from '@/components/WhatsAppCTAButton'
 
 
@@ -34,14 +34,14 @@ export default function Home() {
             </p>
           </div>
 
-          {/* WhatsApp Chat Simulation */}
+          {/* Floating User Messages */}
           <div className='flex justify-center py-8'>
-            <WhatsAppChatSimulation />
+            <FloatingUserMessages />
           </div>
 
-          {/* Community Testimonial */}
+          {/* Community Stats */}
           <div className='py-6'>
-            <CommunityTestimonial />
+            <CommunityStats />
           </div>
 
           {/* CTA Button */}
