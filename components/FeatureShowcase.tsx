@@ -97,83 +97,107 @@ const FEATURE_PAIRS: FeaturePair[] = [
 ]
 
 export const FeatureShowcase = () => {
-  const [currentFeature, setCurrentFeature] = useState(0)
-  const [isVisible, setIsVisible] = useState(false)
-  const sectionRef = useRef<HTMLDivElement>(null)
+  const [visibleFeatures, setVisibleFeatures] = useState<number[]>([])
+  const [phoneVisible, setPhoneVisible] = useState(false)
+  const phoneRef = useRef<HTMLDivElement>(null)
+  const featureRefs = useRef<(HTMLDivElement | null)[]>([])
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
+    // Observer for phone visibility
+    const phoneObserver = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            setIsVisible(true)
-            
-            // Start cycling through features
-            const interval = setInterval(() => {
-              setCurrentFeature((prev) => (prev + 1) % FEATURE_PAIRS.length)
-            }, 8000) // 8 seconds per feature
-            
-            return () => clearInterval(interval)
+            setPhoneVisible(true)
           }
         })
       },
-      { threshold: 0.3 }
+      { threshold: 0.5 }
     )
 
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current)
+    // Observer for individual features
+    const featureObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const featureId = parseInt(entry.target.getAttribute('data-feature-id') || '0')
+            setVisibleFeatures(prev => {
+              if (!prev.includes(featureId)) {
+                return [...prev, featureId]
+              }
+              return prev
+            })
+          }
+        })
+      },
+      { threshold: 0.6 }
+    )
+
+    if (phoneRef.current) {
+      phoneObserver.observe(phoneRef.current)
     }
 
-    return () => observer.disconnect()
+    featureRefs.current.forEach((ref) => {
+      if (ref) {
+        featureObserver.observe(ref)
+      }
+    })
+
+    return () => {
+      phoneObserver.disconnect()
+      featureObserver.disconnect()
+    }
   }, [])
 
-  const feature = FEATURE_PAIRS[currentFeature]
-
   return (
-    <section ref={sectionRef} className="bg-gradient-to-b from-gray-50 to-white py-20">
+    <section className="bg-gradient-to-b from-gray-50 to-white py-20 min-h-screen">
       <div className="container mx-auto px-4">
-        <div className="grid lg:grid-cols-2 gap-12 items-center min-h-[600px]">
-          {/* Left Column - Feature Text */}
-          <div className="space-y-6">
-            <div className="space-y-4">
-              <h2 
-                key={`title-${feature.id}`}
-                className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 leading-tight animate-fade-in"
-              >
-                {feature.title}
-              </h2>
-              <p 
-                key={`desc-${feature.id}`}
-                className="text-xl md:text-2xl text-gray-600 leading-relaxed animate-fade-in"
-                style={{ animationDelay: '0.2s' }}
-              >
-                {feature.description}
-              </p>
-            </div>
-            
-            {/* Feature Progress Indicator */}
-            <div className="flex space-x-2">
-              {FEATURE_PAIRS.map((_, index) => (
-                <div
-                  key={index}
-                  className={`h-1 rounded-full transition-all duration-300 ${
-                    index === currentFeature 
-                      ? 'bg-[#9DFAD7] w-8' 
-                      : 'bg-gray-300 w-4'
-                  }`}
-                />
-              ))}
-            </div>
-          </div>
-
-          {/* Right Column - Mobile Chat */}
-          <div className="flex justify-center lg:justify-end">
+        {/* Phone in center - shows when scrolled into view */}
+        <div ref={phoneRef} className="flex justify-center mb-20">
+          <div className={`transition-all duration-1000 ${phoneVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
             <MobileChat 
-              messages={feature.messages} 
-              isVisible={isVisible}
-              key={feature.id}
+              messages={FEATURE_PAIRS[Math.max(...visibleFeatures) - 1]?.messages || FEATURE_PAIRS[0].messages} 
+              isVisible={phoneVisible}
+              key={Math.max(...visibleFeatures) || 1}
             />
           </div>
+        </div>
+
+        {/* Feature sections - appear on scroll */}
+        <div className="space-y-32">
+          {FEATURE_PAIRS.map((feature, index) => (
+            <div 
+              key={feature.id}
+              ref={(el) => featureRefs.current[index] = el}
+              data-feature-id={feature.id}
+              className="grid lg:grid-cols-2 gap-12 items-center min-h-[400px]"
+            >
+              {/* Feature Text - Left side */}
+              <div className={`space-y-6 transition-all duration-1000 ${
+                visibleFeatures.includes(feature.id) 
+                  ? 'opacity-100 translate-x-0' 
+                  : 'opacity-0 -translate-x-8'
+              }`}>
+                <div className="space-y-4">
+                  <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 leading-tight">
+                    {feature.title}
+                  </h2>
+                  <p className="text-xl md:text-2xl text-gray-600 leading-relaxed">
+                    {feature.description}
+                  </p>
+                </div>
+                
+                {/* Feature indicator */}
+                <div className="flex items-center space-x-3">
+                  <div className="w-3 h-3 bg-[#9DFAD7] rounded-full"></div>
+                  <span className="text-sm font-medium text-gray-500">Beneficio {feature.id}</span>
+                </div>
+              </div>
+
+              {/* Spacer for right column */}
+              <div></div>
+            </div>
+          ))}
         </div>
       </div>
     </section>
