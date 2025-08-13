@@ -6,6 +6,7 @@ import { AuthNavigation } from '@/components/AuthNavigation'
 import { FloatingUserMessages } from '@/components/FloatingUserMessages'
 import { CommunityStats } from '@/components/CommunityStats'
 import { WhatsAppCTAButton } from '@/components/WhatsAppCTAButton'
+import { FeatureShowcase } from '@/components/FeatureShowcase'
 
 
 export default function Home() {
@@ -50,6 +51,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Feature Showcase Section */}
+      <FeatureShowcase />
 
       {/* Chat Examples Section */}
       <div className='bg-[#0D1D35]'>
