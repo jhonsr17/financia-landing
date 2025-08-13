@@ -7,7 +7,7 @@ import { AuthNavigation } from '@/components/AuthNavigation'
 
 export default function Home() {
   return (
-    <main className='min-h-screen bg-gradient-to-b from-[#ECFFF1] via-[#D4FFB5]/60 to-[#9DFAD7]/40'>
+    <main className='min-h-screen bg-gradient-to-br from-[#D4FFB5] via-[#9DFAD7] to-[#A8F5C8]'>
       <nav className='sticky top-0 z-50 bg-[#0D1D35]/95 backdrop-blur-sm border-b border-white/10 container mx-auto px-4 py-4 md:py-6 flex justify-between items-center'>
         <h1 className='text-xl md:text-2xl font-bold text-white'>FinancIA</h1>
         <div className='flex items-center space-x-4 md:space-x-6'>
@@ -19,17 +19,17 @@ export default function Home() {
       </nav>
 
       {/* Hero Section */}
-      <section id='inicio' className='container mx-auto px-4 py-16 md:py-24'>
-        <div className='text-center max-w-4xl mx-auto'>
-          <h2 className='text-4xl md:text-6xl font-bold text-[#0D1D35] leading-tight'>
-            Tu asistente financiero personal, <span className='text-[#0D1D35]'>ahora en tu WhatsApp</span>
+      <section id='inicio' className='min-h-screen flex items-center justify-center px-4'>
+        <div className='text-center max-w-5xl mx-auto'>
+          <h2 className='text-4xl md:text-6xl lg:text-7xl font-bold text-white leading-tight drop-shadow-lg mb-6 md:mb-8'>
+            Tu asistente financiero personal, <span className='text-white'>ahora en tu WhatsApp</span>
           </h2>
-          <p className='text-base md:text-xl text-[#0D1D35]/80 mt-5 md:mt-7 leading-relaxed'>
+          <p className='text-lg md:text-2xl text-white/90 mb-10 md:mb-16 leading-relaxed max-w-3xl mx-auto'>
             Organiza tus finanzas con un simple mensaje en WhatsApp.
           </p>
           <a
             href='/register'
-            className='inline-block bg-gradient-to-r from-[#9DFAD7] to-[#D4FFB5] text-[#0D1D35] font-semibold py-3 px-8 rounded-xl hover:opacity-90 transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-[#9DFAD7]/30 mt-8 text-base md:text-lg'
+            className='inline-block bg-white text-[#0D1D35] font-bold py-4 px-10 md:py-5 md:px-14 rounded-2xl hover:bg-white/95 transition-all duration-300 transform hover:scale-[1.05] active:scale-[0.98] shadow-xl text-lg md:text-xl'
           >
             Chatea ya con FinancIA
           </a>
@@ -37,20 +37,24 @@ export default function Home() {
       </section>
 
       {/* Chat Examples Section */}
-      <ChatCarousel />
+      <div className='bg-[#0D1D35]'>
+        <ChatCarousel />
+      </div>
 
       {/* Stats Section */}
-      <StatsSection />
+      <div className='bg-[#0D1D35]'>
+        <StatsSection />
+      </div>
 
       {/* Features Section */}
-      <section id='producto'>
+      <section id='producto' className='bg-[#0D1D35]'>
         <FeaturesGrid />
       </section>
 
-
-
       {/* Pricing Section */}
-      <PricingSection />
+      <div className='bg-[#0D1D35]'>
+        <PricingSection />
+      </div>
 
       {/* Footer */}
       <footer className='relative py-12 md:py-16 overflow-hidden'>
