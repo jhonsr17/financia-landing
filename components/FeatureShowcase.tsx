@@ -168,7 +168,9 @@ export const FeatureShowcase = () => {
           {FEATURE_PAIRS.map((feature, index) => (
             <div 
               key={feature.id}
-              ref={(el) => featureRefs.current[index] = el}
+              ref={(el) => {
+                featureRefs.current[index] = el
+              }}
               data-feature-id={feature.id}
               className="grid lg:grid-cols-2 gap-12 items-center min-h-[400px]"
             >
