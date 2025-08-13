@@ -4,7 +4,7 @@ import { ProfessionalAvatars } from './ProfessionalAvatars'
 
 export const CommunityStats = () => {
   return (
-    <div className="flex flex-col items-center space-y-4">
+    <div className="flex flex-col items-center space-y-3">
       {/* Professional Avatars */}
       <ProfessionalAvatars />
       

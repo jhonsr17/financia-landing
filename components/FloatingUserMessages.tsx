@@ -36,14 +36,14 @@ export const FloatingUserMessages = () => {
   }, [])
 
   return (
-    <div className="relative w-full max-w-md mx-auto h-32 flex items-center justify-center">
+    <div className="relative w-full max-w-lg mx-auto h-24 flex items-center justify-center">
       <div 
         className={`transition-all duration-500 transform ${
           isVisible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-4 scale-95'
         }`}
       >
-        <div className="bg-[#DCF8C6] text-gray-800 p-4 rounded-2xl shadow-lg max-w-xs relative">
-          <p className="text-sm font-medium leading-relaxed">
+        <div className="bg-[#DCF8C6] text-gray-800 p-5 rounded-2xl shadow-lg max-w-md relative">
+          <p className="text-base md:text-lg font-medium leading-relaxed">
             {USER_MESSAGES[currentMessageIndex]}
           </p>
           <div className="text-xs text-gray-500 mt-2 text-right">

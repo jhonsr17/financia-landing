@@ -23,9 +23,9 @@ export default function Home() {
 
       {/* Hero Section */}
       <section id='inicio' className='min-h-screen flex items-center justify-center px-4 py-8'>
-        <div className='text-center max-w-6xl mx-auto space-y-8'>
+        <div className='text-center max-w-6xl mx-auto space-y-4'>
           {/* Header Title */}
-          <div className='space-y-4'>
+          <div className='space-y-3'>
             <h1 className='text-3xl md:text-5xl lg:text-6xl font-bold text-[#0D1D35] leading-tight'>
               Tu asistente financiero personal, <span className='text-[#0D1D35]'>ahora en tu WhatsApp</span>
             </h1>
@@ -35,17 +35,17 @@ export default function Home() {
           </div>
 
           {/* Floating User Messages */}
-          <div className='flex justify-center py-8'>
+          <div className='flex justify-center py-4'>
             <FloatingUserMessages />
           </div>
 
           {/* Community Stats */}
-          <div className='py-6'>
+          <div className='py-3'>
             <CommunityStats />
           </div>
 
           {/* CTA Button */}
-          <div className='pt-4'>
+          <div className='pt-3'>
             <WhatsAppCTAButton text="Probar Gratis Ahora" href="/register" />
           </div>
         </div>
