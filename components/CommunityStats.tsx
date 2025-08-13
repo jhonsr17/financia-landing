@@ -10,7 +10,7 @@ export const CommunityStats = () => {
       
       {/* Community Text */}
       <div className="text-center">
-        <p className="text-[#0D1D35]/80 text-sm md:text-base font-medium">
+        <p className="text-white/80 text-sm md:text-base font-medium">
           Ya cientos de personas en Colombia y Argentina iniciaron a cambiar sus finanzas
         </p>
       </div>

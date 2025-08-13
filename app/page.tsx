@@ -10,7 +10,7 @@ import { WhatsAppCTAButton } from '@/components/WhatsAppCTAButton'
 
 export default function Home() {
   return (
-    <main className='min-h-screen bg-gradient-to-b from-[#ECFFF1] via-[#D4FFB5]/60 to-[#9DFAD7]/40'>
+    <main className='min-h-screen bg-gradient-to-b from-[#0D1D35] via-[#1a2e4a] to-[#0D1D35]'>
       <nav className='sticky top-0 z-50 bg-[#0D1D35]/95 backdrop-blur-sm border-b border-white/10 container mx-auto px-4 py-4 md:py-6 flex justify-between items-center'>
         <h1 className='text-xl md:text-2xl font-bold text-white'>FinancIA</h1>
         <div className='flex items-center space-x-4 md:space-x-6'>
@@ -26,10 +26,10 @@ export default function Home() {
         <div className='text-center max-w-6xl mx-auto space-y-4'>
           {/* Header Title */}
           <div className='space-y-3'>
-            <h1 className='text-3xl md:text-5xl lg:text-6xl font-bold text-[#0D1D35] leading-tight'>
-              Tu asistente financiero personal, <span className='text-[#0D1D35]'>ahora en tu WhatsApp</span>
+            <h1 className='text-3xl md:text-5xl lg:text-6xl font-bold text-white leading-tight'>
+              Tu asistente financiero personal, <span className='bg-gradient-to-r from-[#9DFAD7] to-[#D4FFB5] text-transparent bg-clip-text'>ahora en tu WhatsApp</span>
             </h1>
-            <p className='text-lg md:text-xl text-[#0D1D35]/80 leading-relaxed max-w-3xl mx-auto'>
+            <p className='text-lg md:text-xl text-white/80 leading-relaxed max-w-3xl mx-auto'>
               Organiza tus finanzas con un simple mensaje en WhatsApp.
             </p>
           </div>
@@ -52,20 +52,24 @@ export default function Home() {
       </section>
 
       {/* Chat Examples Section */}
-      <ChatCarousel />
+      <div className='bg-[#0D1D35]'>
+        <ChatCarousel />
+      </div>
 
       {/* Stats Section */}
-      <StatsSection />
+      <div className='bg-[#0D1D35]'>
+        <StatsSection />
+      </div>
 
       {/* Features Section */}
-      <section id='producto'>
+      <section id='producto' className='bg-[#0D1D35]'>
         <FeaturesGrid />
       </section>
 
-
-
       {/* Pricing Section */}
-      <PricingSection />
+      <div className='bg-[#0D1D35]'>
+        <PricingSection />
+      </div>
 
       {/* Footer */}
       <footer className='relative py-12 md:py-16 overflow-hidden'>
