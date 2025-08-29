@@ -2,6 +2,8 @@ import ChatCarousel from '@/components/ChatCarousel'
 import StatsSection from '@/components/StatsSection'
 import FeaturesGrid from '@/components/FeaturesGrid'
 import PricingSection from '@/components/PricingSection'
+import BenefitsSection from '@/components/benefits-section'
+import FloatingChatWidget from '@/components/floating-chat-widget'
 import { AuthNavigation } from '@/components/AuthNavigation'
 import { FloatingUserMessages } from '@/components/FloatingUserMessages'
 import { CommunityStats } from '@/components/CommunityStats'
@@ -55,6 +57,9 @@ export default function Home() {
       {/* Feature Showcase Section */}
       <FeatureShowcase />
 
+      {/* Benefits with reveal animations (below hero showcasing product) */}
+      <BenefitsSection />
+
       {/* Chat Examples Section */}
       <div className='bg-[#0D1D35]'>
         <ChatCarousel />
@@ -74,6 +79,9 @@ export default function Home() {
       <div className='bg-[#0D1D35]'>
         <PricingSection />
       </div>
+
+      {/* Floating Chat Widget (appears around 50% scroll) */}
+      <FloatingChatWidget />
 
       {/* Footer */}
       <footer className='relative py-12 md:py-16 overflow-hidden'>
