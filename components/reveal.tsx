@@ -40,7 +40,7 @@ export function Reveal ({
 		return () => observer.disconnect()
 	}, [rootMargin, threshold])
 
-	const style: CSSProperties = delayMs ? { animationDelay: `${delayMs}ms` } : undefined
+	const style: CSSProperties | undefined = delayMs ? { animationDelay: `${delayMs}ms` } : undefined
 
 	return (
 		<div
