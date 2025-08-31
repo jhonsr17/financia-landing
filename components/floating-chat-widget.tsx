@@ -81,10 +81,6 @@ export default function FloatingChatWidget() {
 			
 			// Transición fluida desde el hero section
 			if (scrolled > 0) {
-				// Progreso general del scroll (0 a 1)
-				const progress = Math.min(scrolled / (vh * 2), 1)
-				setScrollProgress(progress)
-				
 				// Aparición gradual del teléfono (0% a 30% del scroll)
 				const phoneAppearProgress = Math.min(scrolled / (vh * 0.3), 1)
 				setPhoneOpacity(phoneAppearProgress)
@@ -93,9 +89,14 @@ export default function FloatingChatWidget() {
 				
 				// Cambio de feature basado en el scroll (después de que aparezca el teléfono)
 				if (phoneAppearProgress >= 1) {
-					const featureProgress = Math.min((scrolled - vh * 0.3) / (vh * 1.7), 1)
+					const featureProgress = Math.min((scrolled - vh * 0.3) / (vh * 1.2), 1) // Reducido de 1.7 a 1.2
 					const featureIndex = Math.floor(featureProgress * FEATURE_CONVERSATIONS.length)
 					setCurrentFeature(Math.min(featureIndex, FEATURE_CONVERSATIONS.length - 1))
+					
+					// Actualizar scrollProgress solo para el rango de features
+					setScrollProgress(featureProgress)
+				} else {
+					setScrollProgress(0)
 				}
 			} else {
 				setScrollProgress(0)
@@ -111,29 +112,25 @@ export default function FloatingChatWidget() {
 	}, [])
 
 	// No mostrar nada hasta que haya scroll
-	if (scrollProgress === 0) return null
+	if (scrollProgress === 0 && phoneOpacity === 0) return null
 
 	const currentFeatureData = FEATURE_CONVERSATIONS[currentFeature]
-	const parallaxOffset = scrollProgress * 60
+	const parallaxOffset = scrollProgress * 40 // Reducido para movimiento más sutil
 
 	return (
 		<div className="fixed inset-0 pointer-events-none z-40 flex items-center justify-center">
-			{/* Background with gradual Parallax Effect */}
+			{/* Background - Mismo que el hero section */}
 			<div 
-				className="absolute inset-0 bg-gradient-to-br from-blue-50 via-white to-purple-50"
+				className="absolute inset-0 bg-gradient-to-b from-[#0D1D35] via-[#1a2e4a] to-[#0D1D35]"
 				style={{
-					transform: `translateY(${parallaxOffset * 0.15}px)`,
-					transition: 'transform 0.1s ease-out',
 					opacity: phoneOpacity
 				}}
 			></div>
 			
-			{/* Floating Elements with gradual Parallax */}
+			{/* Floating Elements con opacidad gradual */}
 			<div 
 				className="absolute top-20 left-20 w-16 h-16 bg-gradient-to-br from-green-200 to-blue-200 rounded-full opacity-60 animate-float"
 				style={{
-					transform: `translateY(${parallaxOffset * 0.3}px)`,
-					transition: 'transform 0.1s ease-out',
 					opacity: phoneOpacity * 0.8
 				}}
 			></div>
@@ -141,8 +138,6 @@ export default function FloatingChatWidget() {
 				className="absolute bottom-20 right-20 w-12 h-12 bg-gradient-to-br from-purple-200 to-pink-200 rounded-full opacity-40 animate-float"
 				style={{
 					animationDelay: '2s',
-					transform: `translateY(${parallaxOffset * 0.45}px)`,
-					transition: 'transform 0.1s ease-out',
 					opacity: phoneOpacity * 0.6
 				}}
 			></div>
