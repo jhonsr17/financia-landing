@@ -8,33 +8,42 @@ interface ChatMessage {
 	timestamp: string
 }
 
-const CONVERSATION_SEQUENCES = [
-	// Secuencia 1: Registro de Gastos e Ingresos
-	[
-		{ message: 'Hoy gasté 50 mil pesos en el Uber.', isBot: false, timestamp: '14:23' },
-		{ message: '¡Registrado! 🚕 $50.000 en transporte. ¿Quieres confirmar esta transacción?', isBot: true, timestamp: '14:23' },
-		{ message: 'Sí, confirmo.', isBot: false, timestamp: '14:24' },
-		{ message: '¡Listo! Tu gasto ha sido guardado. ¿Algo más que quieras anotar?', isBot: true, timestamp: '14:24' }
-	],
-	// Secuencia 2: Análisis de Gastos de Fin de Semana
-	[
-		{ message: 'Paz, ¿qué tal estuvo mi fin de semana en gastos?', isBot: false, timestamp: '15:30' },
-		{ message: '¡Uy! 😉 Tu fin de semana te costó $180.000 COP, un 25% más que tu promedio. Mayormente en entretenimiento. ¿Te pasaste un poquito? 😅', isBot: true, timestamp: '15:30' },
-		{ message: 'Jajaja, creo que sí. ¿Algún consejo?', isBot: false, timestamp: '15:31' },
-		{ message: 'Para el próximo fin de semana, podrías intentar establecer un límite de $120.000 COP y buscar planes más económicos. ¡Pequeños cambios hacen la diferencia!', isBot: true, timestamp: '15:31' }
-	],
-	// Secuencia 3: Roadmap para Metas de Ahorro
-	[
-		{ message: 'Paz, quiero comprarle un vestido a mi mamá que vale 200 mil pesos para su cumpleaños el próximo mes.', isBot: false, timestamp: '16:15' },
-		{ message: '¡Qué gran detalle! 👗 Para tu meta del vestido de $200.000 COP en 4 semanas, te sugiero ahorrar $50.000 COP cada semana. ¡Así lo lograrás! ¿Empezamos hoy?', isBot: true, timestamp: '16:15' },
-		{ message: 'Sí, vamos con eso.', isBot: false, timestamp: '16:16' },
-		{ message: '¡Excelente! Te recordaré tu meta semanal y tu progreso. ¡Tu mamá estará feliz! 🎉', isBot: true, timestamp: '16:16' }
-	]
+const CONVERSATION_SCREENS = [
+	// Pantalla 1: Gasto de Transporte
+	{
+		title: 'Registro de Gastos',
+		messages: [
+			{ message: 'Hoy gasté 50 mil pesos en el Uber.', isBot: false, timestamp: '14:23' },
+			{ message: '¡Registrado! 🚕 $50.000 en transporte. ¿Quieres confirmar esta transacción?', isBot: true, timestamp: '14:23' },
+			{ message: 'Sí, confirmo.', isBot: false, timestamp: '14:24' },
+			{ message: '¡Listo! Tu gasto ha sido guardado. ¿Algo más que quieras anotar?', isBot: true, timestamp: '14:24' }
+		]
+	},
+	// Pantalla 2: Presupuesto de Comida
+	{
+		title: 'Presupuesto Semanal',
+		messages: [
+			{ message: 'Paz, ¿cómo va mi presupuesto de comida esta semana?', isBot: false, timestamp: '15:30' },
+			{ message: '¡Excelente pregunta! 🍽️ Has gastado $120.000 de los $200.000 presupuestados. Te quedan $80.000 para los próximos 3 días.', isBot: true, timestamp: '15:30' },
+			{ message: '¿Algún consejo para estirar ese presupuesto?', isBot: false, timestamp: '15:31' },
+			{ message: '¡Claro! Te sugiero planificar las comidas, hacer lista de compras y aprovechar ofertas. ¡Puedes lograrlo! 💪', isBot: true, timestamp: '15:31' }
+		]
+	},
+	// Pantalla 3: Análisis de Gastos
+	{
+		title: 'Análisis Mensual',
+		messages: [
+			{ message: 'Paz, ¿cómo estuvo mi mes financieramente?', isBot: false, timestamp: '16:15' },
+			{ message: '📊 Tu mes fue muy bueno! Ahorraste un 15% más que el mes pasado. Los gastos en entretenimiento bajaron un 20%. ¡Excelente progreso! 🎉', isBot: true, timestamp: '16:15' },
+			{ message: '¡Qué bien! ¿Algún consejo para mantener esta tendencia?', isBot: false, timestamp: '16:16' },
+			{ message: 'Mantén tu rutina de registro diario y sigue revisando tus metas semanalmente. ¡La consistencia es la clave del éxito financiero! 🔑', isBot: true, timestamp: '16:16' }
+		]
+	}
 ]
 
 export default function FloatingChatWidget() {
-	const [isHalfScrolled, setIsHalfScrolled] = useState(false)
-	const [currentSequence, setCurrentSequence] = useState(0)
+	const [scrollProgress, setScrollProgress] = useState(0)
+	const [currentScreen, setCurrentScreen] = useState(0)
 	const [visibleMessages, setVisibleMessages] = useState(0)
 	const containerRef = useRef<HTMLDivElement>(null)
 
@@ -42,61 +51,88 @@ export default function FloatingChatWidget() {
 		const handleScroll = () => {
 			const scrolled = window.scrollY
 			const vh = window.innerHeight
-			setIsHalfScrolled(scrolled > vh * 0.5)
+			const maxScroll = vh * 2 // 2 viewport heights for full effect
+			
+			if (scrolled > vh * 0.3) { // Start at 30% scroll
+				const progress = Math.min((scrolled - vh * 0.3) / (maxScroll - vh * 0.3), 1)
+				setScrollProgress(progress)
+				
+				// Determine current screen based on scroll progress
+				const screenIndex = Math.floor(progress * CONVERSATION_SCREENS.length)
+				setCurrentScreen(Math.min(screenIndex, CONVERSATION_SCREENS.length - 1))
+			} else {
+				setScrollProgress(0)
+				setCurrentScreen(0)
+			}
 		}
-		handleScroll()
+
 		window.addEventListener('scroll', handleScroll, { passive: true })
 		return () => window.removeEventListener('scroll', handleScroll)
 	}, [])
 
 	useEffect(() => {
-		if (!isHalfScrolled) return
+		if (scrollProgress === 0) return
 
 		let mounted = true
-		let sequenceIndex = 0
 		let messageIndex = 0
+		const currentMessages = CONVERSATION_SCREENS[currentScreen].messages
 
 		const showNextMessage = async () => {
 			if (!mounted) return
 
-			const currentSeq = CONVERSATION_SEQUENCES[sequenceIndex]
-			if (messageIndex < currentSeq.length) {
+			if (messageIndex < currentMessages.length) {
 				setVisibleMessages(messageIndex + 1)
 				messageIndex++
-				setTimeout(showNextMessage, 1500)
-			} else {
-				// Move to next sequence
-				messageIndex = 0
-				sequenceIndex = (sequenceIndex + 1) % CONVERSATION_SEQUENCES.length
-				setCurrentSequence(sequenceIndex)
-				setVisibleMessages(0)
-				setTimeout(showNextMessage, 2000)
+				setTimeout(showNextMessage, 1200)
 			}
 		}
 
-		setTimeout(showNextMessage, 1000)
+		setVisibleMessages(0)
+		setTimeout(showNextMessage, 500)
 		return () => { mounted = false }
-	}, [isHalfScrolled])
+	}, [currentScreen, scrollProgress])
 
-	if (!isHalfScrolled) return null
+	if (scrollProgress === 0) return null
 
-	const currentMessages = CONVERSATION_SEQUENCES[currentSequence]
+	const currentScreenData = CONVERSATION_SCREENS[currentScreen]
+	const parallaxOffset = scrollProgress * 100 // Parallax effect
 
 	return (
 		<div className="fixed inset-0 pointer-events-none z-40 flex items-center justify-center">
-			{/* Background Elements */}
-			<div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-white to-purple-50"></div>
+			{/* Background with Parallax Effect */}
+			<div 
+				className="absolute inset-0 bg-gradient-to-br from-blue-50 via-white to-purple-50"
+				style={{
+					transform: `translateY(${parallaxOffset * 0.3}px)`,
+					transition: 'transform 0.1s ease-out'
+				}}
+			></div>
 			
-			{/* Floating Elements */}
-			<div className="absolute top-20 left-20 w-16 h-16 bg-gradient-to-br from-green-200 to-blue-200 rounded-full opacity-60 animate-float"></div>
-			<div className="absolute bottom-20 right-20 w-12 h-12 bg-gradient-to-br from-purple-200 to-pink-200 rounded-full opacity-40 animate-float" style={{ animationDelay: '2s' }}></div>
+			{/* Floating Elements with Parallax */}
+			<div 
+				className="absolute top-20 left-20 w-16 h-16 bg-gradient-to-br from-green-200 to-blue-200 rounded-full opacity-60 animate-float"
+				style={{
+					transform: `translateY(${parallaxOffset * 0.5}px)`,
+					transition: 'transform 0.1s ease-out'
+				}}
+			></div>
+			<div 
+				className="absolute bottom-20 right-20 w-12 h-12 bg-gradient-to-br from-purple-200 to-pink-200 rounded-full opacity-40 animate-float"
+				style={{
+					animationDelay: '2s',
+					transform: `translateY(${parallaxOffset * 0.7}px)`,
+					transition: 'transform 0.1s ease-out'
+				}}
+			></div>
 			
-			{/* Main Phone Mockup */}
+			{/* Main Phone Mockup - Upright Position */}
 			<div 
 				ref={containerRef}
-				className="relative w-[320px] h-[640px] bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 rounded-[40px] shadow-2xl border-8 border-gray-700 overflow-hidden transform rotate-12 hover:rotate-6 transition-transform duration-700"
+				className="relative w-[320px] h-[640px] bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 rounded-[40px] shadow-2xl border-8 border-gray-700 overflow-hidden transform transition-all duration-700"
 				style={{
-					boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.1)'
+					boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.1)',
+					transform: `translateY(${parallaxOffset * 0.2}px) scale(${1 - scrollProgress * 0.1})`,
+					opacity: 1 - scrollProgress * 0.3
 				}}
 			>
 				{/* Phone Screen */}
@@ -134,9 +170,14 @@ export default function FloatingChatWidget() {
 						</div>
 					</div>
 
+					{/* Screen Title */}
+					<div className="bg-gradient-to-r from-[#4CAFB9] to-[#26A69A] px-4 py-2 text-center">
+						<h4 className="text-white text-sm font-medium">{currentScreenData.title}</h4>
+					</div>
+
 					{/* Chat Messages */}
-					<div className="h-[calc(100%-120px)] bg-[#f0f0f0] p-4 space-y-3 overflow-y-auto">
-						{currentMessages.slice(0, visibleMessages).map((msg, idx) => (
+					<div className="h-[calc(100%-140px)] bg-[#f0f0f0] p-4 space-y-3 overflow-y-auto">
+						{currentScreenData.messages.slice(0, visibleMessages).map((msg, idx) => (
 							<div
 								key={idx}
 								className={`flex ${msg.isBot ? 'justify-start' : 'justify-end'} animate-fade-in`}
@@ -172,6 +213,20 @@ export default function FloatingChatWidget() {
 						</div>
 					</div>
 				</div>
+			</div>
+
+			{/* Progress Indicator */}
+			<div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex gap-2">
+				{CONVERSATION_SCREENS.map((_, idx) => (
+					<div
+						key={idx}
+						className={`w-3 h-3 rounded-full transition-all duration-300 ${
+							idx === currentScreen 
+								? 'bg-[#4CAFB9] scale-125' 
+								: 'bg-gray-300'
+						}`}
+					></div>
+				))}
 			</div>
 		</div>
 	)
