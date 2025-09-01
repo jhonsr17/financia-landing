@@ -63,6 +63,30 @@ const FEATURE_CONVERSATIONS: ConversationFeature[] = [
 			{ message: '¡Qué bien! ¿Algún consejo para mantener esta tendencia?', isBot: false, timestamp: '17:01' },
 			{ message: 'Mantén tu rutina de registro diario y sigue revisando tus metas semanalmente. ¡La consistencia es la clave del éxito financiero! 🔑', isBot: true, timestamp: '17:01' }
 		]
+	},
+	// Feature 5: Insights Naturales
+	{
+		title: 'Insights Naturales',
+		description: 'Descubre patrones en tus gastos de forma divertida',
+		icon: '💡',
+		messages: [
+			{ message: 'Paz, ¿qué tal va mi mes?', isBot: false, timestamp: '18:00' },
+			{ message: 'Tu ingreso fue $3.200.000, tu gasto $3.271.000. Eso es... no es un superávit 😬', isBot: true, timestamp: '18:00' },
+			{ message: 'Uff, ¿y qué más?', isBot: false, timestamp: '18:01' },
+			{ message: 'Tu fin de semana te costó $500.000. ¿Cómo estuvo? 😳', isBot: true, timestamp: '18:01' }
+		]
+	},
+	// Feature 6: Hábitos Financieros
+	{
+		title: 'Hábitos Financieros',
+		description: 'Identifica y mejora tus patrones de gasto',
+		icon: '🔍',
+		messages: [
+			{ message: '¿Qué tal mis gastos en comida?', isBot: false, timestamp: '19:00' },
+			{ message: 'Gastaste $0 en tus metas, pero $104.000 en Ubers porque seguías "accidentalmente" durmiendo 😴', isBot: true, timestamp: '19:00' },
+			{ message: 'Jajaja, tienes razón', isBot: false, timestamp: '19:01' },
+			{ message: 'Tu hábito de café no es el problema. Los snacks que compras mientras esperas el café sí 🍪', isBot: true, timestamp: '19:01' }
+		]
 	}
 ]
 
@@ -72,6 +96,8 @@ export default function FloatingChatWidget() {
 	const [phoneOpacity, setPhoneOpacity] = useState(0)
 	const [phoneScale, setPhoneScale] = useState(0.8)
 	const [phoneTranslateY, setPhoneTranslateY] = useState(50)
+	const [phoneTopVisible, setPhoneTopVisible] = useState(false)
+	const [phoneFullVisible, setPhoneFullVisible] = useState(false)
 	const containerRef = useRef<HTMLDivElement>(null)
 
 	useEffect(() => {
@@ -81,27 +107,39 @@ export default function FloatingChatWidget() {
 			
 			// Transición fluida desde el hero section
 			if (scrolled > 0) {
-				// Aparición gradual del teléfono (0% a 30% del scroll)
-				const phoneAppearProgress = Math.min(scrolled / (vh * 0.3), 1)
-				setPhoneOpacity(phoneAppearProgress)
-				setPhoneScale(0.8 + (phoneAppearProgress * 0.2)) // 0.8 a 1.0
-				setPhoneTranslateY(50 - (phoneAppearProgress * 50)) // 50px a 0px
+				// Primera fase: Aparece la parte superior del teléfono (0% a 20% del scroll)
+				const phoneTopProgress = Math.min(scrolled / (vh * 0.2), 1)
+				setPhoneTopVisible(phoneTopProgress > 0)
+				setPhoneOpacity(phoneTopProgress)
 				
-				// Cambio de feature basado en el scroll (después de que aparezca el teléfono)
-				if (phoneAppearProgress >= 1) {
-					const featureProgress = Math.min((scrolled - vh * 0.3) / (vh * 1.2), 1) // Reducido de 1.7 a 1.2
-					const featureIndex = Math.floor(featureProgress * FEATURE_CONVERSATIONS.length)
-					setCurrentFeature(Math.min(featureIndex, FEATURE_CONVERSATIONS.length - 1))
+				// Segunda fase: Aparece el teléfono completo (20% a 40% del scroll)
+				if (phoneTopProgress >= 1) {
+					const phoneFullProgress = Math.min((scrolled - vh * 0.2) / (vh * 0.2), 1)
+					setPhoneFullVisible(phoneFullProgress > 0)
+					setPhoneScale(0.8 + (phoneFullProgress * 0.2)) // 0.8 a 1.0
+					setPhoneTranslateY(50 - (phoneFullProgress * 50)) // 50px a 0px
 					
-					// Actualizar scrollProgress solo para el rango de features
-					setScrollProgress(featureProgress)
+					// Tercera fase: Cambio de features (40% a 100% del scroll)
+					if (phoneFullProgress >= 1) {
+						const featureProgress = Math.min((scrolled - vh * 0.4) / (vh * 0.6), 1)
+						const featureIndex = Math.floor(featureProgress * FEATURE_CONVERSATIONS.length)
+						setCurrentFeature(Math.min(featureIndex, FEATURE_CONVERSATIONS.length - 1))
+						setScrollProgress(featureProgress)
+					} else {
+						setScrollProgress(0)
+					}
 				} else {
+					setPhoneFullVisible(false)
+					setPhoneScale(0.8)
+					setPhoneTranslateY(50)
 					setScrollProgress(0)
 				}
 			} else {
 				setScrollProgress(0)
 				setCurrentFeature(0)
 				setPhoneOpacity(0)
+				setPhoneTopVisible(false)
+				setPhoneFullVisible(false)
 				setPhoneScale(0.8)
 				setPhoneTranslateY(50)
 			}
@@ -112,10 +150,9 @@ export default function FloatingChatWidget() {
 	}, [])
 
 	// No mostrar nada hasta que haya scroll
-	if (scrollProgress === 0 && phoneOpacity === 0) return null
+	if (!phoneTopVisible) return null
 
 	const currentFeatureData = FEATURE_CONVERSATIONS[currentFeature]
-	const parallaxOffset = scrollProgress * 40 // Reducido para movimiento más sutil
 
 	return (
 		<div className="fixed inset-0 pointer-events-none z-40 flex items-center justify-center">
@@ -142,7 +179,7 @@ export default function FloatingChatWidget() {
 				}}
 			></div>
 			
-			{/* Main Phone Mockup - Gradual Appearance */}
+			{/* Main Phone Mockup - Transición fluida */}
 			<div 
 				ref={containerRef}
 				className="relative w-[320px] h-[640px] bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 rounded-[40px] shadow-2xl border-8 border-gray-700 overflow-hidden transform transition-all duration-1000 ease-out"
@@ -188,22 +225,29 @@ export default function FloatingChatWidget() {
 						</div>
 					</div>
 
-					{/* Feature Header - Like Memorae */}
-					<div className="bg-gradient-to-r from-[#4CAFB9] to-[#26A69A] px-4 py-3 text-center">
-						<div className="flex items-center justify-center gap-2 mb-1">
-							<span className="text-2xl">{currentFeatureData.icon}</span>
-							<h4 className="text-white text-sm font-medium">{currentFeatureData.title}</h4>
+					{/* Feature Header - Solo visible cuando el teléfono está completo */}
+					{phoneFullVisible && (
+						<div className="bg-gradient-to-r from-[#4CAFB9] to-[#26A69A] px-4 py-3 text-center">
+							<div className="flex items-center justify-center gap-2 mb-1">
+								<span className="text-2xl">{currentFeatureData.icon}</span>
+								<h4 className="text-white text-sm font-medium">{currentFeatureData.title}</h4>
+							</div>
+							<p className="text-white/90 text-xs">{currentFeatureData.description}</p>
 						</div>
-						<p className="text-white/90 text-xs">{currentFeatureData.description}</p>
-					</div>
+					)}
 
-					{/* Chat Messages - Complete Conversation */}
+					{/* Chat Messages - Aparecen gradualmente */}
 					<div className="h-[calc(100%-160px)] bg-[#f0f0f0] p-4 space-y-3 overflow-y-auto">
-						{currentFeatureData.messages.map((msg, idx) => (
+						{phoneFullVisible && currentFeatureData.messages.map((msg, idx) => (
 							<div
 								key={idx}
 								className={`flex ${msg.isBot ? 'justify-start' : 'justify-end'} animate-fade-in`}
-								style={{ animationDelay: `${idx * 50}ms` }}
+								style={{ 
+									animationDelay: `${idx * 100}ms`,
+									opacity: scrollProgress > (idx * 0.2) ? 1 : 0,
+									transform: scrollProgress > (idx * 0.2) ? 'translateY(0)' : 'translateY(20px)',
+									transition: 'all 0.5s ease-out'
+								}}
 							>
 								<div
 									className={`max-w-[80%] rounded-2xl px-4 py-3 ${
@@ -221,54 +265,58 @@ export default function FloatingChatWidget() {
 						))}
 					</div>
 
-					{/* Input Area */}
-					<div className="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-100 p-3">
-						<div className="flex items-center gap-2">
-							<div className="flex-1 bg-gray-100 rounded-full px-4 py-2 flex items-center gap-2">
-								<span className="text-gray-400 text-sm">Escribe un mensaje...</span>
+					{/* Input Area - Solo visible cuando el teléfono está completo */}
+					{phoneFullVisible && (
+						<div className="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-100 p-3">
+							<div className="flex items-center gap-2">
+								<div className="flex-1 bg-gray-100 rounded-full px-4 py-2 flex items-center gap-2">
+									<span className="text-gray-400 text-sm">Escribe un mensaje...</span>
+								</div>
+								<button className="w-8 h-8 bg-[#4CAFB9] rounded-full flex items-center justify-center">
+									<svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+										<path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.25A1 1 0 009 15.5V9a1 1 0 00-1-1H4a1 1 0 00-1 1v5.5a1 1 0 00.894 1.409l5 1.25a1 1 0 001.169-1.409l-7-14z"/>
+									</svg>
+								</button>
 							</div>
-							<button className="w-8 h-8 bg-[#4CAFB9] rounded-full flex items-center justify-center">
-								<svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-									<path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.25A1 1 0 009 15.5V9a1 1 0 00-1-1H4a1 1 0 00-1 1v5.5a1 1 0 00.894 1.409l5 1.25a1 1 0 001.169-1.409l-7-14z"/>
-								</svg>
-							</button>
 						</div>
-					</div>
+					)}
 				</div>
 			</div>
 
-			{/* Feature Progress Indicator - Gradual Appearance */}
-			<div 
-				className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex gap-3 transition-all duration-1000 ease-out"
-				style={{
-					opacity: phoneOpacity,
-					transform: `translateX(-50%) translateY(${phoneOpacity * 20}px)`
-				}}
-			>
-				{FEATURE_CONVERSATIONS.map((feature, idx) => (
-					<div
-						key={idx}
-						className={`flex flex-col items-center gap-1 transition-all duration-300 ${
-							idx === currentFeature 
-								? 'opacity-100 scale-110' 
-								: 'opacity-40 scale-90'
-						}`}
-					>
-						<div className={`w-4 h-4 rounded-full transition-all duration-300 ${
-							idx === currentFeature 
-								? 'bg-[#4CAFB9]' 
-								: 'bg-gray-300'
-						}`}></div>
-						<span className={`text-xs font-medium transition-colors duration-300 ${
-							idx === currentFeature 
-								? 'text-[#4CAFB9]' 
-								: 'text-gray-400'
-						}`}>
-							{feature.title.split(' ')[0]}
-						</span>
-					</div>
-				))}
-			</div>
+			{/* Feature Progress Indicator - Solo visible cuando el teléfono está completo */}
+			{phoneFullVisible && (
+				<div 
+					className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex gap-3 transition-all duration-1000 ease-out"
+					style={{
+						opacity: phoneOpacity,
+						transform: `translateX(-50%) translateY(${phoneOpacity * 20}px)`
+					}}
+				>
+					{FEATURE_CONVERSATIONS.map((feature, idx) => (
+						<div
+							key={idx}
+							className={`flex flex-col items-center gap-1 transition-all duration-300 ${
+								idx === currentFeature 
+									? 'opacity-100 scale-110' 
+									: 'opacity-40 scale-90'
+							}`}
+						>
+							<div className={`w-4 h-4 rounded-full transition-all duration-300 ${
+								idx === currentFeature 
+									? 'bg-[#4CAFB9]' 
+									: 'bg-gray-300'
+							}`}></div>
+							<span className={`text-xs font-medium transition-colors duration-300 ${
+								idx === currentFeature 
+									? 'text-[#4CAFB9]' 
+									: 'text-gray-400'
+							}`}>
+								{feature.title.split(' ')[0]}
+							</span>
+						</div>
+					))}
+				</div>
+			)}
 		</div>
 	)
 }
