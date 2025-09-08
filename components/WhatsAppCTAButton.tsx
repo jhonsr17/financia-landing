@@ -14,7 +14,7 @@ export const WhatsAppCTAButton = ({
   return (
     <a
       href={href}
-      className={`inline-flex items-center justify-center space-x-3 bg-gradient-to-r from-[#0D1D35] via-[#1a2e4a] to-[#0D1D35] text-white font-bold py-4 px-8 rounded-2xl hover:shadow-2xl hover:shadow-[#0D1D35]/30 transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] text-lg ${className}`}
+      className={`inline-flex items-center justify-center space-x-3 bg-gradient-to-r from-[#25D366] to-[#128C7E] text-white font-bold py-4 px-8 rounded-2xl hover:from-[#128C7E] hover:to-[#25D366] hover:shadow-2xl hover:shadow-[#25D366]/30 transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] text-lg border-2 border-white/20 hover:border-white/40 ${className}`}
     >
       {/* WhatsApp Icon */}
       <svg 

@@ -2,18 +2,15 @@ import ChatCarousel from '@/components/ChatCarousel'
 import StatsSection from '@/components/StatsSection'
 import FeaturesGrid from '@/components/FeaturesGrid'
 import PricingSection from '@/components/PricingSection'
-import BenefitsSection from '@/components/benefits-section'
-import FloatingChatWidget from '@/components/floating-chat-widget'
 import { AuthNavigation } from '@/components/AuthNavigation'
 import { FloatingUserMessages } from '@/components/FloatingUserMessages'
 import { CommunityStats } from '@/components/CommunityStats'
 import { WhatsAppCTAButton } from '@/components/WhatsAppCTAButton'
-import { FeatureShowcase } from '@/components/FeatureShowcase'
 
 
 export default function Home() {
   return (
-    <main className='min-h-screen bg-gradient-to-b from-[#0D1D35] via-[#1a2e4a] to-[#0D1D35]'>
+    <main className='min-h-screen'>
       <nav className='sticky top-0 z-50 bg-[#0D1D35]/95 backdrop-blur-sm border-b border-white/10 container mx-auto px-4 py-4 md:py-6 flex justify-between items-center'>
         <h1 className='text-xl md:text-2xl font-bold text-white'>FinancIA</h1>
         <div className='flex items-center space-x-4 md:space-x-6'>
@@ -24,68 +21,71 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* Hero Section */}
-      <section id='inicio' className='min-h-screen flex items-center justify-center px-4 py-8'>
-        <div className='text-center max-w-6xl mx-auto space-y-4'>
-          {/* Header Title */}
-          <div className='space-y-3'>
-            <h1 className='text-3xl md:text-5xl lg:text-6xl font-bold text-white leading-tight'>
-              Tu asistente financiero personal, <span className='bg-gradient-to-r from-[#9DFAD7] to-[#D4FFB5] text-transparent bg-clip-text'>ahora en tu WhatsApp</span>
-            </h1>
-            <p className='text-lg md:text-xl text-white/80 leading-relaxed max-w-3xl mx-auto'>
-              Organiza tus finanzas con un simple mensaje en WhatsApp.
-            </p>
-          </div>
+      {/* Hero Section with seamless transition */}
+      <section id='inicio' className='relative min-h-screen bg-gradient-to-b from-[#0D1D35] via-[#1a2e4a] to-[#0D1D35]'>
+        <div className='min-h-screen flex items-center justify-center px-4 py-8'>
+          <div className='text-center max-w-6xl mx-auto space-y-12'>
+            {/* Main Title - Centered and Large */}
+            <div className='space-y-6'>
+              <h1 className='text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-tight'>
+                Tu coach financiero en WhatsApp,
+              </h1>
+              <p className='text-2xl md:text-3xl lg:text-4xl text-[#9DFAD7] font-medium leading-relaxed'>
+                tan simple como chatear con un amigo
+              </p>
+            </div>
 
-          {/* Floating User Messages */}
-          <div className='flex justify-center py-4'>
-            <FloatingUserMessages />
-          </div>
+            {/* Floating User Messages */}
+            <div className='flex justify-center py-8'>
+              <FloatingUserMessages />
+            </div>
 
-          {/* Community Stats */}
-          <div className='py-3'>
-            <CommunityStats />
-          </div>
+            {/* Community Stats */}
+            <div className='py-6'>
+              <CommunityStats />
+            </div>
 
-          {/* CTA Button */}
-          <div className='pt-3'>
-            <WhatsAppCTAButton text="Probar Gratis Ahora" href="/register" />
+            {/* CTA Button */}
+            <div className='pt-6'>
+              <a
+                href="https://wa.me/573227031301?text=👋%20Hola%20FinancIA,%20soy%20parte%20del%20combo%20💼💸%20¿Cómo%20empiezo%20para%20poner%20en%20orden%20mis%20finanzas?"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-[#80E8C0] to-[#C0F080] text-[#0D1D35] font-bold text-lg rounded-2xl hover:from-[#C0F080] hover:to-[#80E8C0] transition-all duration-300 transform hover:scale-105 shadow-xl hover:shadow-[#80E8C0]/30 border-2 border-white/30 hover:border-white/50"
+              >
+                <svg className="w-6 h-6 mr-3" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.214-.361a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488"/>
+                </svg>
+                Probar Gratis Ahora
+              </a>
+            </div>
           </div>
         </div>
+
       </section>
 
-      {/* Feature Showcase Section */}
-      <FeatureShowcase />
-
-      {/* Benefits with reveal animations (below hero showcasing product) */}
-      <BenefitsSection />
-
-      {/* Chat Examples Section */}
-      <div className='bg-[#0D1D35]'>
+      {/* Chat Examples Section - seamlessly connected */}
+      <div className='bg-gradient-to-b from-[#0D1D35] via-[#1a2e4a] to-[#0D1D35]'>
         <ChatCarousel />
       </div>
 
       {/* Stats Section */}
-      <div className='bg-[#0D1D35]'>
+      <div className='bg-gradient-to-b from-[#0D1D35] via-[#1a2e4a] to-[#0D1D35]'>
         <StatsSection />
       </div>
 
       {/* Features Section */}
-      <section id='producto' className='bg-[#0D1D35]'>
+      <section id='producto' className='bg-gradient-to-b from-[#0D1D35] via-[#1a2e4a] to-[#0D1D35]'>
         <FeaturesGrid />
       </section>
 
       {/* Pricing Section */}
-      <div className='bg-[#0D1D35]'>
+      <div className='bg-gradient-to-b from-[#0D1D35] via-[#1a2e4a] to-[#0D1D35]'>
         <PricingSection />
       </div>
 
-      {/* Floating Chat Widget (appears around 50% scroll) */}
-      <FloatingChatWidget />
-
       {/* Footer */}
-      <footer className='relative py-12 md:py-16 overflow-hidden'>
-        <div className='absolute inset-0 bg-gradient-to-b from-[#0D1D35]/90 to-[#0D1D35]'></div>
+      <footer className='relative py-12 md:py-16 overflow-hidden bg-gradient-to-b from-[#0D1D35] via-[#1a2e4a] to-[#0D1D35]'>
         <div className='absolute inset-0 bg-[url("/grid.svg")] opacity-5'></div>
         <div className='container mx-auto px-4 relative'>
           <div className='grid md:grid-cols-3 gap-8 md:gap-12'>

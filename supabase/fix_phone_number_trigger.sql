@@ -20,6 +20,8 @@ BEGIN
     NEW.raw_user_meta_data->>'full_name',
     phone_number  -- 👈 ACTUALIZADO: teléfono sin '+'
   )
+
+  
   ON CONFLICT (id) DO UPDATE SET
     gmail = EXCLUDED.gmail,
     nombre = EXCLUDED.nombre,

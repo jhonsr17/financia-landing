@@ -69,4 +69,4 @@ export async function getUser(request: NextRequest, response: NextResponse) {
   );
 
   return supabase.auth.getUser();
-} 
+}

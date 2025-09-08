@@ -1,33 +1,30 @@
-import { NextRequest, NextResponse } from "next/server";
-import { getUser, updateSession } from "./utils/supabase/middleware";
+import { NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
 
-export async function middleware(request: NextRequest) {
-  const protectedRoutesList = ["/dashboard"],
-    authRoutesList = ["/login", "/register"];
-  const currentPath = new URL(request.url).pathname;
+export function middleware(request: NextRequest) {
+  // Agregar headers de seguridad y rendimiento
+  const response = NextResponse.next()
 
-  // Excluir server actions del middleware
-  if (currentPath.startsWith('/_next/') || currentPath.includes('/api/')) {
-    return NextResponse.next();
-  }
+  // Headers de seguridad
+  response.headers.set('X-Frame-Options', 'DENY')
+  response.headers.set('X-Content-Type-Options', 'nosniff')
+  response.headers.set('Referrer-Policy', 'origin-when-cross-origin')
 
-  const {
-    data: { user },
-  } = await getUser(request, NextResponse.next());
+  // Headers de rendimiento
+  response.headers.set('X-DNS-Prefetch-Control', 'on')
   
-  if (protectedRoutesList.includes(currentPath) && !user) {
-    return NextResponse.redirect(new URL("/login", request.url));
-  }
-  
-  if (authRoutesList.includes(currentPath) && user) {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
-  }
-  
-  return await updateSession(request);
+  return response
 }
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     */
+    '/((?!api|_next/static|_next/image|favicon.ico).*)',
   ],
-}; 
+}
