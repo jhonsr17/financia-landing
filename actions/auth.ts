@@ -36,6 +36,7 @@ export async function logIn(formData: FormData) {
 
     if (error) {
       // Manejo específico de errores de Supabase
+      console.error('auth.signInWithPassword error:', { message: error.message, status: (error as any)?.status })
       if (error.message.includes("Invalid login credentials")) {
         return { error: "Email o contraseña incorrectos" };
       }
@@ -51,6 +52,7 @@ export async function logIn(formData: FormData) {
     // 🎯 Redirigir al dashboard después del login exitoso
     redirect("/dashboard");
   } catch (error) {
+    console.error('logIn catch error:', error)
     return {
       error: "Error del servidor. Intenta más tarde"
     };
