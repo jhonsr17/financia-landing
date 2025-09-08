@@ -1,9 +1,11 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import CountryCodeSelector from './CountryCodeSelector'
 
 export const RegisterForm = () => {
+  const router = useRouter()
   const [error, setError] = useState<string>('')
   const [success, setSuccess] = useState<string>('')
   const [isLoading, setIsLoading] = useState(false)
@@ -73,10 +75,8 @@ export const RegisterForm = () => {
       } else if (result.success) {
         setSuccess(result.success)
         setIsSuccessful(true)
-        // Limpiar formulario después de mostrar éxito
-        setTimeout(() => {
-          form.reset()
-        }, 3000) // Limpiar después de 3 segundos
+        // Redirigir inmediatamente al dashboard tras registro exitoso
+        router.push('/dashboard')
       } else {
         setError('Error inesperado. Intenta nuevamente')
       }
