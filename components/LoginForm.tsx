@@ -1,12 +1,14 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { logIn } from '@/actions/auth'
 
 export const LoginForm = () => {
   const [error, setError] = useState<string>('')
   const [isLoading, setIsLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
+  const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -20,6 +22,10 @@ export const LoginForm = () => {
       
       if (result?.error) {
         setError(result.error)
+      } else if (result?.success) {
+        // Redirigir al dashboard después del login exitoso
+        router.push('/dashboard')
+        router.refresh() // Forzar actualización para que el middleware detecte la sesión
       }
     } catch (error) {
       setError('Error inesperado. Intenta nuevamente')

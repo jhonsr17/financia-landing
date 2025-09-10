@@ -1,21 +1,43 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import { createServerClient } from '@supabase/ssr'
 
-export function middleware(request: NextRequest) {
-  // Agregar headers de seguridad y rendimiento
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  // Detectar sesión de Supabase por cookies (v2 usa cookies sb-... auth token)
-  const cookies = request.cookies.getAll()
-  const hasSupabaseSession = cookies.some(c =>
-    c.name.includes('sb') && (
-      c.name.includes('auth') || c.name.includes('access-token') || c.name.includes('refresh-token')
-    )
+  // Crear cliente Supabase para middleware
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll()
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) => {
+            request.cookies.set(name, value)
+          })
+        },
+      },
+    }
   )
+  
+  // Obtener sesión real de Supabase
+  const { data: { session } } = await supabase.auth.getSession()
+  
+  // Verificar si el usuario está autenticado
+  const isAuthenticated = !!session?.user
 
-  // Redirigir a dashboard si ya está autenticado y está en landing/login/register
-  if (hasSupabaseSession && (pathname === '/' || pathname.startsWith('/login') || pathname.startsWith('/register'))) {
+  // Redirigir a dashboard si está autenticado y está en landing/login/register
+  if (isAuthenticated && (pathname === '/' || pathname.startsWith('/login') || pathname.startsWith('/register'))) {
     const url = new URL('/dashboard', request.url)
+    return NextResponse.redirect(url)
+  }
+
+  // Redirigir a login si NO está autenticado y está en dashboard
+  if (!isAuthenticated && pathname.startsWith('/dashboard')) {
+    const url = new URL('/login', request.url)
     return NextResponse.redirect(url)
   }
 
