@@ -5,6 +5,16 @@ import { createServerClient } from '@supabase/ssr'
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
+  // Solo verificar autenticación si es necesario
+  const needsAuthCheck = pathname === '/' || 
+                        pathname.startsWith('/login') || 
+                        pathname.startsWith('/register') || 
+                        pathname.startsWith('/dashboard')
+
+  if (!needsAuthCheck) {
+    return NextResponse.next()
+  }
+
   // Crear cliente Supabase para middleware
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -23,11 +33,24 @@ export async function middleware(request: NextRequest) {
     }
   )
   
-  // Obtener sesión real de Supabase
-  const { data: { session } } = await supabase.auth.getSession()
-  
-  // Verificar si el usuario está autenticado
-  const isAuthenticated = !!session?.user
+  // Obtener sesión real de Supabase con manejo de errores
+  let isAuthenticated = false
+  try {
+    const { data: { session }, error } = await supabase.auth.getSession()
+    
+    if (error) {
+      // Solo logear errores críticos, no los de refresh token
+      if (error.message !== 'Invalid Refresh Token: Refresh Token Not Found') {
+        console.log('Auth error in middleware:', error.message)
+      }
+      isAuthenticated = false
+    } else {
+      isAuthenticated = !!session?.user
+    }
+  } catch (error) {
+    console.log('Unexpected auth error in middleware:', error)
+    isAuthenticated = false
+  }
 
   // Redirigir a dashboard si está autenticado y está en landing/login/register
   if (isAuthenticated && (pathname === '/' || pathname.startsWith('/login') || pathname.startsWith('/register'))) {

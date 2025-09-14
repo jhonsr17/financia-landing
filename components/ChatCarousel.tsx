@@ -82,7 +82,7 @@ const ChatCarousel = () => {
       <div className="container mx-auto px-4">
         <h2 className="text-2xl md:text-4xl font-bold text-white text-center mb-8 md:mb-12 px-4">
           Imagina tener un amigo que{' '}
-          <span className="text-[#9DFAD7]">siempre cuida tu dinero</span>
+          <span className="text-[#5ce1e6]">siempre cuida tu dinero</span>
         </h2>
         
         <div 

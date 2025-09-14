@@ -16,7 +16,7 @@ const AVATARS = [
   { 
     name: "Ana", 
     profession: "Médica", 
-    gradient: "from-green-400 to-emerald-400",
+    gradient: "from-[#5ce1e6] to-[#4dd0e1]",
     initial: "A"
   },
   { 

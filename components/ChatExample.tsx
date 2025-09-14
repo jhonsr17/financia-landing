@@ -61,7 +61,7 @@ const ChatExample = ({ messages }: ChatExampleProps) => {
     <div className="bg-[#0D1D35]/50 backdrop-blur-sm rounded-xl md:rounded-2xl p-3 md:p-4 shadow-xl w-[280px] md:w-[300px] mx-1 md:mx-2 flex-shrink-0 border border-white/10">
       {/* Header del chat */}
       <div className="flex items-center space-x-2 md:space-x-3 mb-3 md:mb-4 pb-2 md:pb-3 border-b border-white/10">
-        <div className="w-6 h-6 md:w-8 md:h-8 bg-[#9DFAD7] rounded-full flex items-center justify-center text-[#0D1D35] font-bold text-sm md:text-base">
+        <div className="w-6 h-6 md:w-8 md:h-8 bg-[#5ce1e6] rounded-full flex items-center justify-center text-[#0D1D35] font-bold text-sm md:text-base">
           F
         </div>
         <div>
@@ -80,7 +80,7 @@ const ChatExample = ({ messages }: ChatExampleProps) => {
             <div
               className={`${
                 message.isUser
-                  ? 'bg-[#9DFAD7] text-[#0D1D35]'
+                  ? 'bg-[#5ce1e6] text-[#0D1D35]'
                   : 'bg-white/10 text-white'
               } p-2 md:p-3 rounded-xl md:rounded-2xl max-w-[85%]`}
             >

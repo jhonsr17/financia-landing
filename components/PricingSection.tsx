@@ -27,13 +27,13 @@ const PricingSection = () => {
         >
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
             Comienza tu{' '}
-            <span className="bg-gradient-to-r from-[#9DFAD7] to-[#D4FFB5] bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-[#5ce1e6] to-[#4dd0e1] bg-clip-text text-transparent">
               transformación financiera
             </span>
           </h2>
           <p className="text-xl text-white/80 max-w-2xl mx-auto">
             Únete al lanzamiento exclusivo y sé de los primeros en experimentar FinancIA{' '}
-            <span className="border-b-2 border-[#9DFAD7] text-[#9DFAD7]">totalmente gratis</span>
+            <span className="border-b-2 border-[#5ce1e6] text-[#5ce1e6]">totalmente gratis</span>
           </p>
         </motion.div>
 
@@ -46,7 +46,7 @@ const PricingSection = () => {
         >
           <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden relative">
             {/* Header del plan */}
-            <div className="bg-gradient-to-r from-[#9DFAD7] to-[#D4FFB5] p-8 text-center text-[#0D1D35]">
+            <div className="bg-gradient-to-r from-[#5ce1e6] to-[#4dd0e1] p-8 text-center text-[#0D1D35]">
               <h3 className="text-2xl font-bold mb-2">Plan Lanzamiento</h3>
               <p className="text-[#0D1D35]/70 text-sm">
                 Acceso exclusivo para early adopters
@@ -84,8 +84,8 @@ const PricingSection = () => {
                     viewport={{ once: true }}
                     className="flex items-center text-gray-700"
                   >
-                    <div className="flex-shrink-0 w-5 h-5 bg-[#9DFAD7]/20 rounded-full flex items-center justify-center mr-3">
-                      <Check className="w-3 h-3 text-[#9DFAD7]" />
+                    <div className="flex-shrink-0 w-5 h-5 bg-[#5ce1e6]/20 rounded-full flex items-center justify-center mr-3">
+                      <Check className="w-3 h-3 text-[#5ce1e6]" />
                     </div>
                     <feature.icon className="w-4 h-4 text-gray-500 mr-2" />
                     <span className="text-sm">{feature.text}</span>
@@ -100,7 +100,7 @@ const PricingSection = () => {
                 href="/register"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className="w-full bg-gradient-to-r from-[#9DFAD7] to-[#D4FFB5] hover:from-[#9DFAD7]/90 hover:to-[#D4FFB5]/90 text-[#0D1D35] font-semibold py-4 px-6 rounded-xl transition duration-300 shadow-lg hover:shadow-xl block text-center"
+                className="w-full bg-gradient-to-r from-[#5ce1e6] to-[#4dd0e1] hover:from-[#5ce1e6]/90 hover:to-[#4dd0e1]/90 text-[#0D1D35] font-semibold py-4 px-6 rounded-xl transition duration-300 shadow-lg hover:shadow-xl block text-center"
               >
                 Chatea ya con FinancIA
               </motion.a>

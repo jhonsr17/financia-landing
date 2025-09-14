@@ -5,7 +5,7 @@ const StatsSection = () => {
     <section className="bg-[#0D1D35] py-8 md:py-12">
       <div className="container mx-auto px-4">
         <h2 className="text-2xl md:text-4xl font-bold text-center mb-8 md:mb-16">
-          <span className="text-[#9DFAD7]">Descubre patrones</span>
+          <span className="text-[#5ce1e6]">Descubre patrones</span>
           <span className="text-white">, no solo números.</span>
         </h2>
 
@@ -14,10 +14,10 @@ const StatsSection = () => {
           <div className="bg-white/10 backdrop-blur-lg rounded-2xl md:rounded-3xl p-6 md:p-8">
             <h3 className="text-xl md:text-2xl font-bold text-white mb-6 md:mb-8">Resumen de Gastos</h3>
             <div className="grid grid-cols-2 gap-3 md:gap-4">
-              <div className="bg-[#9DFAD7]/20 rounded-xl md:rounded-2xl p-4 md:p-6">
-                <p className="text-[#9DFAD7] text-xs md:text-sm mb-1 md:mb-2">Hoy</p>
+              <div className="bg-[#5ce1e6]/20 rounded-xl md:rounded-2xl p-4 md:p-6">
+                <p className="text-[#5ce1e6] text-xs md:text-sm mb-1 md:mb-2">Hoy</p>
                 <p className="text-white text-xl md:text-3xl font-bold leading-tight">$85.000</p>
-                <p className="text-[#9DFAD7]/80 text-xs md:text-sm">COP</p>
+                <p className="text-[#5ce1e6]/80 text-xs md:text-sm">COP</p>
               </div>
               <div className="bg-blue-500/20 rounded-xl md:rounded-2xl p-4 md:p-6">
                 <p className="text-blue-300 text-xs md:text-sm mb-1 md:mb-2">Esta Semana</p>

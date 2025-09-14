@@ -14,8 +14,8 @@ module.exports = {
       },
       colors: {
         // Colores de la landing FinancIA
-        primary: '#9DFAD7',
-        secondary: '#D4FFB5',
+        primary: '#5ce1e6',
+        secondary: '#4dd0e1',
         dark: '#0D1D35',
         
         // Colores para el dashboard
