@@ -37,14 +37,14 @@ export const BudgetMetric = ({
         className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-lg rounded-2xl p-4 sm:p-6 lg:p-8 border border-white/20 shadow-2xl relative overflow-hidden"
       >
         {/* Efectos de fondo */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[#9DFAD7]/10 to-transparent pointer-events-none" />
-        <div className="absolute top-0 right-0 w-20 h-20 sm:w-32 sm:h-32 bg-[#9DFAD7]/5 rounded-full blur-3xl" />
+        <div className="absolute inset-0 bg-gradient-to-br from-[#5ce1e6]/10 to-transparent pointer-events-none" />
+        <div className="absolute top-0 right-0 w-20 h-20 sm:w-32 sm:h-32 bg-[#5ce1e6]/5 rounded-full blur-3xl" />
         
         <div className="relative z-10">
           {/* Header - Responsivo */}
           <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-4 sm:mb-6">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-[#9DFAD7] to-[#D4FFB5] rounded-xl flex items-center justify-center flex-shrink-0">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-[#5ce1e6] to-[#4dd0e1] rounded-xl flex items-center justify-center flex-shrink-0">
                 <DollarSign className="h-5 w-5 sm:h-6 sm:w-6 text-[#0D1D35]" />
               </div>
               <div className="min-w-0 flex-1">
@@ -188,8 +188,8 @@ export const BudgetMetric = ({
       onMouseLeave={() => setShowTooltip(false)}
     >
       {/* Efectos de fondo */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#9DFAD7]/10 to-transparent pointer-events-none" />
-      <div className="absolute top-0 right-0 w-20 h-20 sm:w-32 sm:h-32 bg-[#9DFAD7]/5 rounded-full blur-3xl" />
+      <div className="absolute inset-0 bg-gradient-to-br from-[#5ce1e6]/10 to-transparent pointer-events-none" />
+      <div className="absolute top-0 right-0 w-20 h-20 sm:w-32 sm:h-32 bg-[#5ce1e6]/5 rounded-full blur-3xl" />
       
       <div className="relative z-10">
         {/* Header con estado - Responsivo */}

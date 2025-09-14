@@ -28,12 +28,26 @@ export const useTransactionsUnified = () => {
     
     const getUser = async () => {
       try {
-        const { data: { user } } = await supabase.auth.getUser()
+        const { data: { user }, error } = await supabase.auth.getUser()
         if (mounted) {
-          setUser(user)
+          if (error) {
+            // Filtrar errores de refresh token
+            if (!error.message.includes('Invalid Refresh Token')) {
+              console.error('Error getting user:', error.message)
+            }
+            setUser(null)
+          } else {
+            setUser(user)
+          }
         }
       } catch (err) {
-        console.error('Error getting user:', err)
+        // Filtrar errores de refresh token
+        if (err instanceof Error && !err.message.includes('Invalid Refresh Token')) {
+          console.error('Error getting user:', err)
+        }
+        if (mounted) {
+          setUser(null)
+        }
       }
     }
     
@@ -46,43 +60,51 @@ export const useTransactionsUnified = () => {
 
   // Función para cargar transacciones - Memoizada
   const fetchTransactions = useCallback(async () => {
-    if (!user) {
-      setLoading(false)
-      return
-    }
-
     try {
       setLoading(true)
       setError(null)
       
+      console.log('📋 TRANSACTION - Cargando transacciones...')
+      
+      // Verificar autenticación usando getUser() - método seguro
+      const { data: { user: authenticatedUser }, error: authError } = await supabase.auth.getUser()
+      
+      if (authError || !authenticatedUser) {
+        console.log('⚠️ TRANSACTION - Usuario no autenticado, saltando carga')
+        setLoading(false)
+        setTransactions([])
+        return
+      }
+
+      console.log('📋 TRANSACTION - Usuario autenticado:', authenticatedUser.id)
+      
       const { data, error } = await supabase
         .from('transacciones')
         .select('*')
-        .eq('usuario_id', user.id)
+        .eq('usuario_id', authenticatedUser.id)
         .order('creado_en', { ascending: false })
 
       if (error) {
-        console.error('Error fetching transactions:', error)
+        console.error('❌ TRANSACTION - Error fetching transactions:', error)
         setError(`Error al cargar transacciones: ${error.message}`)
         setTransactions([])
       } else {
+        console.log('✅ TRANSACTION - Transacciones cargadas:', data?.length || 0)
         setTransactions(data || [])
       }
     } catch (err) {
-      console.error('Error:', err)
+      console.error('💥 TRANSACTION - Error:', err)
       setError('Error al cargar transacciones')
       setTransactions([])
     } finally {
       setLoading(false)
     }
-  }, [user, supabase])
+  }, [supabase])
 
-  // Cargar transacciones cuando el usuario cambie - Solo cuando sea necesario
+  // Cargar transacciones cuando se monte el componente
   useEffect(() => {
-    if (user) {
-      fetchTransactions()
-    }
-  }, [user, fetchTransactions])
+    fetchTransactions()
+  }, [fetchTransactions])
 
   // Cálculos derivados - Optimizados con useMemo
   const totalSpent = useMemo(() => 
@@ -189,12 +211,22 @@ export const useTransactionsUnified = () => {
     tipo: 'gasto' | 'ingreso'
     descripcion?: string
   }) => {
-    if (!user) throw new Error('Usuario no autenticado')
+    console.log('💰 TRANSACTION - Creando nueva transacción...')
+    
+    // Verificar autenticación usando getUser() - método seguro
+    const { data: { user: authenticatedUser }, error: authError } = await supabase.auth.getUser()
+    
+    if (authError || !authenticatedUser) {
+      console.error('❌ TRANSACTION - Error de autenticación:', authError)
+      throw new Error('Usuario no autenticado')
+    }
+
+    console.log('💰 TRANSACTION - Usuario autenticado:', authenticatedUser.id)
 
     const { data, error } = await supabase
       .from('transacciones')
       .insert({
-        usuario_id: user.id,
+        usuario_id: authenticatedUser.id,
         valor: transactionData.valor,
         categoria: transactionData.categoria,
         tipo: transactionData.tipo,
@@ -203,14 +235,58 @@ export const useTransactionsUnified = () => {
       .select()
 
     if (error) {
-      console.error('Error creating transaction:', error)
+      console.error('❌ TRANSACTION - Error creating transaction:', error)
       throw error
     }
+
+    console.log('✅ TRANSACTION - Transacción creada:', data[0])
 
     // Recargar transacciones después de crear una nueva
     await fetchTransactions()
     return data[0]
-  }, [user, supabase, fetchTransactions])
+  }, [supabase, fetchTransactions])
+
+  // Función para eliminar una transacción
+  const deleteTransaction = useCallback(async (transactionId: string): Promise<boolean> => {
+    try {
+      console.log('🗑️ TRANSACTION - Eliminando transacción:', transactionId)
+
+      // Verificar autenticación usando getUser() - método seguro
+      const { data: { user: authenticatedUser }, error: authError } = await supabase.auth.getUser()
+      
+      if (authError || !authenticatedUser) {
+        console.error('❌ TRANSACTION - Error de autenticación:', authError)
+        return false
+      }
+
+      console.log('🗑️ TRANSACTION - Usuario autenticado:', authenticatedUser.id)
+
+      const { error } = await supabase
+        .from('transacciones')
+        .delete()
+        .eq('id', transactionId)
+        .eq('usuario_id', authenticatedUser.id) // Asegurar que solo elimine sus propias transacciones
+
+      if (error) {
+        console.error('❌ TRANSACTION - Error eliminando transacción:', error)
+        console.error('❌ TRANSACTION - Detalles del error:', {
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+          code: error.code
+        })
+        return false
+      }
+
+      console.log('✅ TRANSACTION - Transacción eliminada exitosamente')
+      // Refrescar datos después de eliminar
+      await fetchTransactions()
+      return true
+    } catch (error) {
+      console.error('💥 TRANSACTION - Error inesperado eliminando transacción:', error)
+      return false
+    }
+  }, [supabase, fetchTransactions])
 
   return {
     transactions,
@@ -225,6 +301,7 @@ export const useTransactionsUnified = () => {
     weeklyTrend,
     refetch: fetchTransactions,
     createTransaction,
+    deleteTransaction,
     user
   }
 }

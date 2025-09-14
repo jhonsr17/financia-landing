@@ -15,6 +15,8 @@ import { BudgetTable } from '@/components/dashboard/BudgetTable'
 import WhatsAppChatButton from '@/components/dashboard/WhatsAppChatButton'
 
 import { BudgetSetupModal } from '@/components/dashboard/BudgetSetupModal'
+import { BudgetByCategory } from '@/components/dashboard/BudgetByCategory'
+import { TransactionsTableImproved } from '@/components/dashboard/TransactionsTableImproved'
 import { useTransactionsUnified } from '@/hooks/useTransactionsUnified'
 import { useBudget } from '@/hooks/useBudget'
 
@@ -35,7 +37,8 @@ export default function DashboardPage() {
     monthExpenses,
     expensesByCategory,
     weeklyTrend,
-    refetch: refetchTransactions
+    refetch: refetchTransactions,
+    deleteTransaction
   } = useTransactionsUnified()
 
   const {
@@ -108,7 +111,7 @@ export default function DashboardPage() {
     return (
       <div className="min-h-screen bg-[#0D1D35] flex items-center justify-center">
         <div className="text-white text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#9DFAD7] mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#5ce1e6] mx-auto mb-4"></div>
           <p className="text-sm sm:text-base">Cargando tu dashboard...</p>
         </div>
       </div>
@@ -122,7 +125,7 @@ export default function DashboardPage() {
         <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-3 sm:py-4">
           <div className="flex justify-between items-center">
             <div className="flex items-center">
-              <Link href="/" className="text-xl sm:text-2xl font-bold text-white hover:text-[#9DFAD7] transition-colors">
+              <Link href="/" className="text-xl sm:text-2xl font-bold text-white hover:text-[#5ce1e6] transition-colors">
                 FinancIA
               </Link>
             </div>
@@ -189,14 +192,25 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {/* Tabla de Presupuesto Visual */}
+        {/* Presupuesto por Categorías */}
         <div className="mb-6 sm:mb-8">
-          <BudgetTable userId={user?.id} />
+          <BudgetByCategory 
+            userId={user?.id || ''}
+            onBudgetUpdate={() => {
+              // Refrescar presupuesto total
+              window.location.reload()
+            }}
+          />
         </div>
 
-        {/* WhatsApp Chat Button */}
+        {/* Tabla de Transacciones Mejorada */}
         <div className="mb-6 sm:mb-8">
-          <WhatsAppChatButton />
+          <TransactionsTableImproved 
+            transactions={transactions}
+            onTransactionDeleted={refetchTransactions}
+            onDeleteTransaction={deleteTransaction}
+            loading={transactionsLoading}
+          />
         </div>
 
         {/* Formulario para agregar transacciones - Posición fija en móvil */}
@@ -213,7 +227,7 @@ export default function DashboardPage() {
           <div className="lg:col-span-2">
             <div className="bg-gradient-to-br from-white/5 to-white/2 backdrop-blur-sm rounded-2xl p-4 sm:p-6 border border-white/10">
               <div className="text-center py-8 sm:py-12">
-                <div className="w-16 h-16 sm:w-20 sm:h-20 bg-[#9DFAD7]/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 bg-[#5ce1e6]/20 rounded-full flex items-center justify-center mx-auto mb-4">
                   <span className="text-2xl sm:text-3xl">📊</span>
                 </div>
                 <h3 className="text-lg sm:text-xl font-semibold text-white mb-2">
@@ -225,6 +239,11 @@ export default function DashboardPage() {
               </div>
             </div>
           </div>
+        </div>
+
+        {/* WhatsApp Chat Button - Al final de la página */}
+        <div className="mb-6 sm:mb-8">
+          <WhatsAppChatButton />
         </div>
       </main>
 

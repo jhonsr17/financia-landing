@@ -15,15 +15,24 @@ export const useBudget = () => {
       const now = new Date()
       const currentMonth = now.getMonth() + 1
       const currentYear = now.getFullYear()
+      const monthStart = new Date(currentYear, currentMonth - 1, 1)
+      const monthEnd = new Date(currentYear, currentMonth, 0)
 
-      console.log('🔍 BUDGET - Cargando presupuesto para:', { userId, mes: currentMonth, año: currentYear })
+      console.log('🔍 BUDGET - Cargando presupuesto para:', { 
+        userId, 
+        mes: currentMonth, 
+        año: currentYear,
+        monthStart: monthStart.toISOString().split('T')[0],
+        monthEnd: monthEnd.toISOString().split('T')[0]
+      })
 
+      // Buscar presupuestos del mes actual por categoría
       const { data, error } = await supabase
         .from('presupuestos')
-        .select('valor')
+        .select('valor, categorias')
         .eq('usuario_id', userId)
-        .eq('mes', `${currentYear}-${currentMonth.toString().padStart(2, '0')}-01`)
-        .maybeSingle()
+        .gte('mes', monthStart.toISOString().split('T')[0])
+        .lte('mes', monthEnd.toISOString().split('T')[0])
 
       if (error) {
         console.error('❌ BUDGET - Error cargando presupuesto:', error)
@@ -35,11 +44,14 @@ export const useBudget = () => {
         return
       }
 
-      if (data?.valor) {
-        console.log('✅ BUDGET - Presupuesto cargado desde Supabase:', data.valor)
-        setTotalBudget(data.valor)
+      if (data && data.length > 0) {
+        // Sumar todos los presupuestos del mes (por categoría)
+        const totalBudgetValue = data.reduce((sum, budget) => sum + Number(budget.valor), 0)
+        console.log('✅ BUDGET - Presupuesto cargado desde Supabase:', totalBudgetValue, 'de', data.length, 'categorías')
+        console.log('📊 BUDGET - Detalle por categoría:', data.map(b => `${b.categorias}: $${b.valor}`).join(', '))
+        setTotalBudget(totalBudgetValue)
         // Sincronizar con localStorage como respaldo
-        localStorage.setItem(`budget_${userId}`, data.valor.toString())
+        localStorage.setItem(`budget_${userId}`, totalBudgetValue.toString())
       } else {
         console.log('📭 BUDGET - No hay presupuesto en Supabase, usando localStorage')
         // No hay presupuesto en Supabase, intentar localStorage
@@ -59,20 +71,32 @@ export const useBudget = () => {
   useEffect(() => {
     const supabase = createSupabaseClient()
     
-    // Obtener usuario actual
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      setUser(user)
-      
-      if (user) {
-        loadBudgetFromSupabase(user.id)
+    // Obtener usuario actual con manejo de errores
+    supabase.auth.getUser().then(({ data: { user }, error }) => {
+      if (error) {
+        // Filtrar errores de refresh token
+        if (!error.message.includes('Invalid Refresh Token')) {
+          console.error('Error obteniendo usuario:', error.message)
+        }
+        setUser(null)
+        setTotalBudget(0)
+      } else {
+        setUser(user)
+        if (user) {
+          loadBudgetFromSupabase(user.id)
+        }
       }
-      
       setLoading(false)
     })
 
     // Suscribirse a cambios de autenticación
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
+        // Filtrar eventos de refresh token inválido
+        if (event === 'TOKEN_REFRESHED' && !session) {
+          return
+        }
+        
         setUser(session?.user || null)
         
         if (session?.user) {
@@ -98,17 +122,28 @@ export const useBudget = () => {
       const now = new Date()
       const currentMonth = now.getMonth() + 1
       const currentYear = now.getFullYear()
-      const monthDate = `${currentYear}-${currentMonth.toString().padStart(2, '0')}-01`
+      const monthDate = new Date(currentYear, currentMonth - 1, 1)
 
-      // Usar UPSERT para crear o actualizar
+      // Primero eliminar presupuestos existentes del mes
+      const { error: deleteError } = await supabase
+        .from('presupuestos')
+        .delete()
+        .eq('usuario_id', user.id)
+        .gte('mes', monthDate.toISOString().split('T')[0])
+        .lte('mes', new Date(currentYear, currentMonth, 0).toISOString().split('T')[0])
+
+      if (deleteError) {
+        console.error('❌ BUDGET - Error eliminando presupuestos anteriores:', deleteError)
+      }
+
+      // Crear un presupuesto general para el mes
       const { data, error } = await supabase
         .from('presupuestos')
-        .upsert({
+        .insert({
           usuario_id: user.id,
-          mes: monthDate,
+          mes: monthDate.toISOString().split('T')[0],
+          categorias: 'General',
           valor: newBudget
-        }, {
-          onConflict: 'usuario_id,mes'
         })
         .select()
 

@@ -47,11 +47,6 @@ export const AddTransactionForm = ({ onTransactionAdded }: AddTransactionFormPro
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
-    if (!user) {
-      alert('Usuario no autenticado')
-      return
-    }
-
     if (!valor || !categoria) {
       alert('Por favor completa todos los campos requeridos')
       return
@@ -66,22 +61,51 @@ export const AddTransactionForm = ({ onTransactionAdded }: AddTransactionFormPro
     setIsLoading(true)
 
     try {
-      const { error } = await supabase
+      console.log('💰 TRANSACTION - Verificando autenticación...')
+      
+      // Verificar autenticación usando getUser() - método seguro
+      const { data: { user: authenticatedUser }, error: authError } = await supabase.auth.getUser()
+      
+      if (authError || !authenticatedUser) {
+        console.error('❌ TRANSACTION - Error de autenticación:', authError)
+        alert('Error de autenticación. Por favor, inicia sesión nuevamente.')
+        return
+      }
+
+      console.log('💰 TRANSACTION - Usuario autenticado:', authenticatedUser.id)
+      console.log('💰 TRANSACTION - Guardando transacción:', {
+        usuario_id: authenticatedUser.id,
+        valor: valorNumerico,
+        categoria,
+        tipo,
+        descripcion: descripcion || null
+      })
+
+      const { data, error } = await supabase
         .from('transacciones')
         .insert({
-          usuario_id: user.id,
+          usuario_id: authenticatedUser.id,
           valor: valorNumerico,
           categoria: categoria,
           tipo: tipo,
           descripcion: descripcion || null,
           creado_en: new Date().toISOString()
         })
+        .select()
 
       if (error) {
-        console.error('Error al guardar la transacción:', error)
+        console.error('❌ TRANSACTION - Error al guardar la transacción:', error)
+        console.error('❌ TRANSACTION - Detalles del error:', {
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+          code: error.code
+        })
         alert(`Error al guardar la transacción: ${error.message}`)
         return
       }
+
+      console.log('✅ TRANSACTION - Transacción guardada exitosamente:', data)
 
       // Éxito
       resetForm()
@@ -119,7 +143,7 @@ export const AddTransactionForm = ({ onTransactionAdded }: AddTransactionFormPro
   return (
     <div className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-lg rounded-2xl p-4 sm:p-6 border border-white/20 shadow-2xl">
       <div className="flex items-center gap-3 mb-4 sm:mb-6">
-        <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-[#9DFAD7] to-[#D4FFB5] rounded-xl flex items-center justify-center flex-shrink-0">
+        <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-[#5ce1e6] to-[#4dd0e1] rounded-xl flex items-center justify-center flex-shrink-0">
           <Plus className="h-5 w-5 sm:h-6 sm:w-6 text-[#0D1D35]" />
         </div>
         <div className="min-w-0 flex-1">
@@ -131,7 +155,7 @@ export const AddTransactionForm = ({ onTransactionAdded }: AddTransactionFormPro
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger asChild>
           <Button 
-            className="w-full bg-gradient-to-r from-[#9DFAD7] to-[#D4FFB5] text-[#0D1D35] hover:opacity-90 transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-[#9DFAD7]/20 text-sm sm:text-base py-2 sm:py-3"
+            className="w-full bg-gradient-to-r from-[#5ce1e6] to-[#4dd0e1] text-[#0D1D35] hover:opacity-90 transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-[#5ce1e6]/20 text-sm sm:text-base py-2 sm:py-3"
             onClick={() => setIsOpen(true)}
           >
             <Plus className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
@@ -207,7 +231,7 @@ export const AddTransactionForm = ({ onTransactionAdded }: AddTransactionFormPro
                 id="categoria"
                 value={categoria}
                 onChange={(e) => setCategoria(e.target.value)}
-                className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 sm:py-3 text-white text-sm sm:text-base focus:outline-none focus:border-[#9DFAD7] focus:ring-1 focus:ring-[#9DFAD7]"
+                className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 sm:py-3 text-white text-sm sm:text-base focus:outline-none focus:border-[#5ce1e6] focus:ring-1 focus:ring-[#5ce1e6]"
                 required
                 disabled={categoriesLoading}
               >
@@ -256,7 +280,7 @@ export const AddTransactionForm = ({ onTransactionAdded }: AddTransactionFormPro
               <Button
                 type="submit"
                 disabled={isLoading || !valor || !categoria}
-                className="bg-gradient-to-r from-[#9DFAD7] to-[#D4FFB5] text-[#0D1D35] hover:opacity-90 disabled:opacity-50 text-sm sm:text-base py-2 sm:py-3"
+                className="bg-gradient-to-r from-[#5ce1e6] to-[#4dd0e1] text-[#0D1D35] hover:opacity-90 disabled:opacity-50 text-sm sm:text-base py-2 sm:py-3"
               >
                 {isLoading ? 'Guardando...' : `Guardar ${tipo}`}
               </Button>
@@ -268,7 +292,7 @@ export const AddTransactionForm = ({ onTransactionAdded }: AddTransactionFormPro
       {/* Información adicional - Responsivo */}
       <div className="mt-4 sm:mt-6 p-3 sm:p-4 bg-white/5 rounded-xl border border-white/10">
         <div className="flex items-start gap-3">
-          <div className="w-2 h-2 bg-[#9DFAD7] rounded-full mt-2 flex-shrink-0"></div>
+          <div className="w-2 h-2 bg-[#5ce1e6] rounded-full mt-2 flex-shrink-0"></div>
           <div>
             <p className="text-white/80 text-xs sm:text-sm font-medium mb-1">
               Tip Financiero

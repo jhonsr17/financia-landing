@@ -39,16 +39,27 @@ export async function middleware(request: NextRequest) {
     const { data: { session }, error } = await supabase.auth.getSession()
     
     if (error) {
-      // Solo logear errores críticos, no los de refresh token
-      if (error.message !== 'Invalid Refresh Token: Refresh Token Not Found') {
-        console.log('Auth error in middleware:', error.message)
+      // Filtrar errores de refresh token y limpiar cookies si es necesario
+      if (error.message.includes('Invalid Refresh Token') || error.message.includes('Refresh Token Not Found')) {
+        // Limpiar cookies de autenticación problemáticas
+        const response = NextResponse.next()
+        response.cookies.delete('sb-access-token')
+        response.cookies.delete('sb-refresh-token')
+        response.cookies.delete('supabase-auth-token')
+        return response
       }
+      
+      // Solo logear otros errores críticos
+      console.log('Auth error in middleware:', error.message)
       isAuthenticated = false
     } else {
       isAuthenticated = !!session?.user
     }
   } catch (error) {
-    console.log('Unexpected auth error in middleware:', error)
+    // No logear errores de refresh token en catch
+    if (error instanceof Error && !error.message.includes('Invalid Refresh Token')) {
+      console.log('Unexpected auth error in middleware:', error)
+    }
     isAuthenticated = false
   }
 
