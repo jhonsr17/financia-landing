@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { createSupabaseClient } from '@/utils/supabase/client'
 import { useTransactionsUnified } from '@/hooks/useTransactionsUnified'
 import { useCategories } from '@/hooks/useCategories'
 
@@ -22,9 +21,8 @@ export const AddTransactionForm = ({ onTransactionAdded }: AddTransactionFormPro
   const [categoria, setCategoria] = useState('')
   const [descripcion, setDescripcion] = useState('')
 
-  const { user } = useTransactionsUnified()
+  const { user, createTransaction } = useTransactionsUnified()
   const { gastoCategories, ingresoCategories, loading: categoriesLoading } = useCategories()
-  const supabase = createSupabaseClient()
 
   // Fallback para categorías si no se cargan desde la DB
   const gastosCategories = gastoCategories.length > 0 
@@ -61,57 +59,23 @@ export const AddTransactionForm = ({ onTransactionAdded }: AddTransactionFormPro
     setIsLoading(true)
 
     try {
-      console.log('💰 TRANSACTION - Verificando autenticación...')
+      console.log('💰 TRANSACTION - Creando transacción usando hook...')
       
-      // Verificar autenticación usando getUser() - método seguro
-      const { data: { user: authenticatedUser }, error: authError } = await supabase.auth.getUser()
-      
-      if (authError || !authenticatedUser) {
-        console.error('❌ TRANSACTION - Error de autenticación:', authError)
-        alert('Error de autenticación. Por favor, inicia sesión nuevamente.')
-        return
-      }
-
-      console.log('💰 TRANSACTION - Usuario autenticado:', authenticatedUser.id)
-      console.log('💰 TRANSACTION - Guardando transacción:', {
-        usuario_id: authenticatedUser.id,
+      // Usar el método createTransaction del hook que ya incluye refetch automático
+      await createTransaction({
         valor: valorNumerico,
-        categoria,
-        tipo,
-        descripcion: descripcion || null
+        categoria: categoria,
+        tipo: tipo,
+        descripcion: descripcion || undefined
       })
 
-      const { data, error } = await supabase
-        .from('transacciones')
-        .insert({
-          usuario_id: authenticatedUser.id,
-          valor: valorNumerico,
-          categoria: categoria,
-          tipo: tipo,
-          descripcion: descripcion || null,
-          creado_en: new Date().toISOString()
-        })
-        .select()
-
-      if (error) {
-        console.error('❌ TRANSACTION - Error al guardar la transacción:', error)
-        console.error('❌ TRANSACTION - Detalles del error:', {
-          message: error.message,
-          details: error.details,
-          hint: error.hint,
-          code: error.code
-        })
-        alert(`Error al guardar la transacción: ${error.message}`)
-        return
-      }
-
-      console.log('✅ TRANSACTION - Transacción guardada exitosamente:', data)
+      console.log('✅ TRANSACTION - Transacción creada exitosamente')
 
       // Éxito
       resetForm()
       setIsOpen(false)
       
-      // Llamar callback para refrescar datos
+      // Llamar callback adicional si existe (aunque el hook ya hace refetch)
       if (onTransactionAdded) {
         onTransactionAdded()
       }
@@ -121,7 +85,8 @@ export const AddTransactionForm = ({ onTransactionAdded }: AddTransactionFormPro
 
     } catch (error) {
       console.error('Error:', error)
-      alert('Error inesperado al guardar la transacción')
+      const message = error instanceof Error ? error.message : String(error)
+      alert(`Error al guardar la transacción: ${message}`)
     } finally {
       setIsLoading(false)
     }

@@ -90,16 +90,6 @@ export const useTransactionsUnified = () => {
         setTransactions([])
       } else {
         console.log('✅ TRANSACTION - Transacciones cargadas:', data?.length || 0)
-        if (data && data.length > 0) {
-          console.log('📋 TRANSACTION - Primeras 3 transacciones:', data.slice(0, 3))
-          console.log('📅 TRANSACTION - Fechas de transacciones:', data.map(t => ({
-            id: t.id.substring(0, 8),
-            tipo: t.tipo,
-            valor: t.valor,
-            fecha: t.creado_en,
-            fechaParsed: new Date(t.creado_en).toLocaleDateString('es-CO')
-          })).slice(0, 5))
-        }
         setTransactions(data || [])
       }
     } catch (err) {
@@ -143,19 +133,7 @@ export const useTransactionsUnified = () => {
       return transactionDate >= todayStart && transactionDate <= todayEnd
     })
     
-    const total = todayTransactions.reduce((sum, t) => sum + (t.valor || 0), 0)
-    
-    if (transactions.length > 0) {
-      console.log('📅 TODAY EXPENSES - Calculando gastos de hoy:', {
-        todayStart: todayStart.toISOString(),
-        todayEnd: todayEnd.toISOString(),
-        totalTransactions: transactions.length,
-        todayTransactions: todayTransactions.length,
-        total
-      })
-    }
-    
-    return total
+    return todayTransactions.reduce((sum, t) => sum + (t.valor || 0), 0)
   }, [transactions])
 
   // Gastos de esta semana
