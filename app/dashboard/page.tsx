@@ -6,7 +6,7 @@ import { createSupabaseClient } from '@/utils/supabase/client'
 import { logOut } from '@/actions/auth'
 import { User } from '@supabase/supabase-js'
 import { useRouter } from 'next/navigation'
-import { BudgetMetric } from '@/components/dashboard/BudgetMetric'
+import { BalanceMetric } from '@/components/dashboard/BalanceMetric'
 import { CategoryChart } from '@/components/dashboard/CategoryChart'
 import { WeeklyTrendChart } from '@/components/dashboard/WeeklyTrendChart'
 import { AddTransactionForm } from '@/components/dashboard/AddTransactionForm'
@@ -17,12 +17,10 @@ import { BudgetSetupModal } from '@/components/dashboard/BudgetSetupModal'
 import { BudgetByCategory } from '@/components/dashboard/BudgetByCategory'
 import { TransactionsTableImproved } from '@/components/dashboard/TransactionsTableImproved'
 import { useTransactionsUnified } from '@/hooks/useTransactionsUnified'
-import { useBudget } from '@/hooks/useBudget'
 
 export default function DashboardPage() {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
-  const [showBudgetModal, setShowBudgetModal] = useState(false)
   const router = useRouter()
 
   const {
@@ -40,11 +38,7 @@ export default function DashboardPage() {
     deleteTransaction
   } = useTransactionsUnified()
 
-  const {
-    totalBudget,
-    loading: budgetLoading,
-    saveBudget
-  } = useBudget()
+  // Removed useBudget hook as we're only showing balance now
 
   useEffect(() => {
     const supabase = createSupabaseClient()
@@ -83,14 +77,7 @@ export default function DashboardPage() {
     }
   }
 
-  const handleBudgetUpdate = async (newBudget: number) => {
-    await saveBudget(newBudget)
-  }
-
-  const handleBudgetSetup = async (newBudget: number) => {
-    await saveBudget(newBudget)
-    setShowBudgetModal(false)
-  }
+  // Removed budget-related handlers as we're only showing balance now
 
   const handleCategoryClick = (category: string) => {
     console.log('Categoría seleccionada:', category)
@@ -106,7 +93,7 @@ export default function DashboardPage() {
   const isNewUser = !transactionsLoading && (!transactions || transactions.length === 0)
 
   // Loading state
-  if (isLoading || transactionsLoading || budgetLoading) {
+  if (isLoading || transactionsLoading) {
     return (
       <div className="min-h-screen bg-[#0D1D35] flex items-center justify-center">
         <div className="text-white text-center">
@@ -148,13 +135,9 @@ export default function DashboardPage() {
       <main className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-6 lg:py-8">
         {/* Balance Mensual Principal - Ingresos vs Gastos */}
         <div className="mb-6 sm:mb-8">
-          <BudgetMetric
-            totalBudget={totalBudget}
-            spentAmount={totalSpent}
+          <BalanceMetric
             totalIncome={totalIncome}
-            onBudgetUpdate={handleBudgetUpdate}
-            onOpenBudgetModal={() => setShowBudgetModal(true)}
-            isNewUser={isNewUser}
+            spentAmount={totalSpent}
           />
         </div>
 
@@ -232,13 +215,7 @@ export default function DashboardPage() {
         </div>
       </main>
 
-      {/* Modal de configuración de presupuesto */}
-      <BudgetSetupModal
-        isOpen={showBudgetModal}
-        currentBudget={totalBudget}
-        onClose={() => setShowBudgetModal(false)}
-        onSave={handleBudgetSetup}
-      />
+      {/* Modal de configuración de presupuesto - Removed as we're only showing balance */}
     </div>
   )
 } 
