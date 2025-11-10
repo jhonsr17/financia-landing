@@ -50,7 +50,7 @@ export const AuthNavigation = () => {
     return (
       <div className='flex items-center space-x-3 md:space-x-4 ml-2 md:ml-4'>
         <span className='text-white/80 text-sm md:text-base hidden md:block'>
-          Hola, {user.user_metadata?.name || user.email}
+          Hola, {user.user_metadata?.full_name || 'Usuario'}
         </span>
         <Link
           href='/dashboard'
