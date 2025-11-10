@@ -105,6 +105,18 @@ export default function DashboardPage() {
 
   // Determinar si es un usuario nuevo (sin transacciones)
   const isNewUser = !transactionsLoading && (!transactions || transactions.length === 0)
+  
+  // Debug temporal
+  console.log('🔍 DASHBOARD DEBUG:', {
+    transactionsLoading,
+    transactionsCount: transactions?.length || 0,
+    isNewUser,
+    todayExpenses,
+    weekExpenses,
+    monthExpenses,
+    totalSpent,
+    user: user?.id
+  })
 
   // Loading state
   if (isLoading || transactionsLoading || budgetLoading) {
