@@ -103,7 +103,8 @@ export const TransactionsTableImproved = ({
 
     } catch (error) {
       console.error('Error inesperado:', error)
-      setDeleteError(`Error inesperado: ${error.message}`)
+      const message = error instanceof Error ? error.message : String(error)
+      setDeleteError(`Error inesperado: ${message}`)
     } finally {
       setDeletingId(null)
     }
