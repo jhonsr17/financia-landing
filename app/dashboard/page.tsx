@@ -171,17 +171,15 @@ export default function DashboardPage() {
           />
         </div>
 
-        {/* Resumen de Gastos - Solo si hay transacciones */}
-        {!isNewUser && (
-          <div className="mb-6 sm:mb-8">
-            <ExpenseSummary
-              todayExpenses={todayExpenses}
-              weekExpenses={weekExpenses}
-              monthExpenses={monthExpenses}
-              totalExpenses={totalSpent}
-            />
-          </div>
-        )}
+        {/* Resumen de Gastos - Siempre visible para debug */}
+        <div className="mb-6 sm:mb-8">
+          <ExpenseSummary
+            todayExpenses={todayExpenses}
+            weekExpenses={weekExpenses}
+            monthExpenses={monthExpenses}
+            totalExpenses={totalSpent}
+          />
+        </div>
 
         {/* Métricas 2 y 3: Grid responsivo - Solo si hay transacciones */}
         {!isNewUser && (
