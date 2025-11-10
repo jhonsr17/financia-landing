@@ -9,7 +9,6 @@ import { useRouter } from 'next/navigation'
 import { BudgetMetric } from '@/components/dashboard/BudgetMetric'
 import { CategoryChart } from '@/components/dashboard/CategoryChart'
 import { WeeklyTrendChart } from '@/components/dashboard/WeeklyTrendChart'
-import { ExpenseSummary } from '@/components/dashboard/ExpenseSummary'
 import { AddTransactionForm } from '@/components/dashboard/AddTransactionForm'
 import { BudgetTable } from '@/components/dashboard/BudgetTable'
 import WhatsAppChatButton from '@/components/dashboard/WhatsAppChatButton'
@@ -105,18 +104,6 @@ export default function DashboardPage() {
 
   // Determinar si es un usuario nuevo (sin transacciones)
   const isNewUser = !transactionsLoading && (!transactions || transactions.length === 0)
-  
-  // Debug temporal
-  console.log('🔍 DASHBOARD DEBUG:', {
-    transactionsLoading,
-    transactionsCount: transactions?.length || 0,
-    isNewUser,
-    todayExpenses,
-    weekExpenses,
-    monthExpenses,
-    totalSpent,
-    user: user?.id
-  })
 
   // Loading state
   if (isLoading || transactionsLoading || budgetLoading) {
@@ -159,7 +146,7 @@ export default function DashboardPage() {
       </header>
 
       <main className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-6 lg:py-8">
-        {/* Métrica 1: Balance/Presupuesto principal - Responsivo */}
+        {/* Balance Mensual Principal - Ingresos vs Gastos */}
         <div className="mb-6 sm:mb-8">
           <BudgetMetric
             totalBudget={totalBudget}
@@ -171,36 +158,24 @@ export default function DashboardPage() {
           />
         </div>
 
-        {/* Resumen de Gastos - Siempre visible para debug */}
-        <div className="mb-6 sm:mb-8">
-          <ExpenseSummary
-            todayExpenses={todayExpenses}
-            weekExpenses={weekExpenses}
-            monthExpenses={monthExpenses}
-            totalExpenses={totalSpent}
-          />
-        </div>
-
-        {/* Métricas 2 y 3: Grid responsivo - Solo si hay transacciones */}
-        {!isNewUser && (
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 mb-6 sm:mb-8">
-            {/* Métrica 2: Gastos por categoría */}
-            <div className="order-1">
-              <CategoryChart
-                expensesByCategory={expensesByCategory}
-                onCategoryClick={handleCategoryClick}
-              />
-            </div>
-
-            {/* Métrica 3: Tendencia semanal */}
-            <div className="order-2">
-              <WeeklyTrendChart
-                weeklyData={weeklyTrend}
-                onWeekClick={handleWeekClick}
-              />
-            </div>
+        {/* Métricas principales: Tendencia semanal y Gastos por categoría */}
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 mb-6 sm:mb-8">
+          {/* Gastos por categoría */}
+          <div className="order-1">
+            <CategoryChart
+              expensesByCategory={expensesByCategory}
+              onCategoryClick={handleCategoryClick}
+            />
           </div>
-        )}
+
+          {/* Tendencia semanal */}
+          <div className="order-2">
+            <WeeklyTrendChart
+              weeklyData={weeklyTrend}
+              onWeekClick={handleWeekClick}
+            />
+          </div>
+        </div>
 
         {/* Presupuesto por Categorías */}
         <div className="mb-6 sm:mb-8">

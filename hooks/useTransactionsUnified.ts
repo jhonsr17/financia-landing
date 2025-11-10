@@ -90,15 +90,6 @@ export const useTransactionsUnified = () => {
         setTransactions([])
       } else {
         console.log('✅ TRANSACTION - Transacciones cargadas:', data?.length || 0)
-        console.log('📋 TRANSACTION - Usuario ID:', authenticatedUser.id)
-        if (data && data.length > 0) {
-          console.log('📅 TRANSACTION - Muestra de transacciones:', data.slice(0, 2).map(t => ({
-            id: t.id.substring(0, 8),
-            tipo: t.tipo,
-            valor: t.valor,
-            fecha: new Date(t.creado_en).toLocaleDateString('es-CO')
-          })))
-        }
         setTransactions(data || [])
       }
     } catch (err) {
