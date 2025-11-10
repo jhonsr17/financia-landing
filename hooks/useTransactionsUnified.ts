@@ -90,6 +90,16 @@ export const useTransactionsUnified = () => {
         setTransactions([])
       } else {
         console.log('✅ TRANSACTION - Transacciones cargadas:', data?.length || 0)
+        if (data && data.length > 0) {
+          console.log('📋 TRANSACTION - Primeras 3 transacciones:', data.slice(0, 3))
+          console.log('📅 TRANSACTION - Fechas de transacciones:', data.map(t => ({
+            id: t.id.substring(0, 8),
+            tipo: t.tipo,
+            valor: t.valor,
+            fecha: t.creado_en,
+            fechaParsed: new Date(t.creado_en).toLocaleDateString('es-CO')
+          })).slice(0, 5))
+        }
         setTransactions(data || [])
       }
     } catch (err) {
@@ -124,24 +134,42 @@ export const useTransactionsUnified = () => {
   // Gastos de hoy
   const todayExpenses = useMemo(() => {
     const today = new Date()
-    return transactions
-      .filter(t => {
-        if (!t.creado_en || t.tipo !== 'gasto') return false
-        const transactionDate = new Date(t.creado_en)
-        return today.toDateString() === transactionDate.toDateString()
+    const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate())
+    const todayEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59, 999)
+    
+    const todayTransactions = transactions.filter(t => {
+      if (!t.creado_en || t.tipo !== 'gasto') return false
+      const transactionDate = new Date(t.creado_en)
+      return transactionDate >= todayStart && transactionDate <= todayEnd
+    })
+    
+    const total = todayTransactions.reduce((sum, t) => sum + (t.valor || 0), 0)
+    
+    if (transactions.length > 0) {
+      console.log('📅 TODAY EXPENSES - Calculando gastos de hoy:', {
+        todayStart: todayStart.toISOString(),
+        todayEnd: todayEnd.toISOString(),
+        totalTransactions: transactions.length,
+        todayTransactions: todayTransactions.length,
+        total
       })
-      .reduce((sum, t) => sum + (t.valor || 0), 0)
+    }
+    
+    return total
   }, [transactions])
 
   // Gastos de esta semana
   const weekExpenses = useMemo(() => {
     const today = new Date()
+    const todayEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59, 999)
     const sevenDaysAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000)
+    const weekStart = new Date(sevenDaysAgo.getFullYear(), sevenDaysAgo.getMonth(), sevenDaysAgo.getDate())
+    
     return transactions
       .filter(t => {
         if (!t.creado_en || t.tipo !== 'gasto') return false
         const transactionDate = new Date(t.creado_en)
-        return transactionDate >= sevenDaysAgo && transactionDate <= today
+        return transactionDate >= weekStart && transactionDate <= todayEnd
       })
       .reduce((sum, t) => sum + (t.valor || 0), 0)
   }, [transactions])
@@ -149,12 +177,14 @@ export const useTransactionsUnified = () => {
   // Gastos de este mes
   const monthExpenses = useMemo(() => {
     const today = new Date()
+    const todayEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59, 999)
     const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1)
+    
     return transactions
       .filter(t => {
         if (!t.creado_en || t.tipo !== 'gasto') return false
         const transactionDate = new Date(t.creado_en)
-        return transactionDate >= firstDayOfMonth && transactionDate <= today
+        return transactionDate >= firstDayOfMonth && transactionDate <= todayEnd
       })
       .reduce((sum, t) => sum + (t.valor || 0), 0)
   }, [transactions])
